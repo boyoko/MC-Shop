@@ -1,0 +1,70 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using MC.NetCore.DomainModels.RequestDto;
+using MC.NetCore.DataAccessSqlServerProvider;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using MC.NetCore.Repository.Enums;
+
+namespace MC.NetCore.Repository
+{
+    public class StoreRepository : IStoreRepository
+    {
+        private readonly ShopDbContext _shopDbContext;
+        public StoreRepository(ShopDbContext context)
+        {
+            _shopDbContext = context;
+        }
+        public async Task<bool> UpdateStore(StoreRequestDto request)
+        {
+            //无需检查库存数量，直接增，扣库存
+            var product = _shopDbContext.ProductExtense.FirstOrDefault(a=>a.ProductId==request.ProductId);
+            if (product == null)
+                return false;
+            switch (request.StoreType)
+            {
+                case (int)OperationTypeEnum.OnShelves:  //上货
+                    product.CurrentCount = product.CurrentCount + request.ModifyCount;
+                    //上货结束后改变批次表状态
+                    break;
+                case (int)OperationTypeEnum.CheckStore:  //盘点
+                    product.CurrentCount = request.ModifyCount;
+                    break;
+                case (int)OperationTypeEnum.OffShelves:  //下架(在售)
+                    product.CurrentCount = product.CurrentCount - request.ModifyCount;
+                    break;
+                case (int)OperationTypeEnum.SoldOut: //下架
+                    product.CurrentCount = product.CurrentCount - request.ModifyCount;
+                    //修改商品表中商品状态
+                    break;
+                case (int)OperationTypeEnum.Sale:  //售卖
+                    product.CurrentCount = product.CurrentCount - request.ModifyCount;
+                    break;
+                default:
+                    break;
+
+            }
+
+            _shopDbContext.Entry(product).State = EntityState.Modified;
+            await _shopDbContext.SaveChangesAsync();
+            if(request.StoreType== (int)OperationTypeEnum.OnShelves)
+            {
+                await UpdateDeliveryStatus(request.ShopId);
+            }
+            return true;
+        }
+
+        private async Task<bool> UpdateDeliveryStatus(int shopId)
+        {
+            var googbatch = _shopDbContext.GoodsPickingBatch.FirstOrDefault(c=>c.ShopId== shopId);
+            googbatch.DeliveryStatus = (int)DeliveryStatusEnum.Deliveryed;
+            _shopDbContext.Entry(googbatch).State = EntityState.Modified;
+            await _shopDbContext.SaveChangesAsync();
+            return true;
+        }
+
+
+    }
+}

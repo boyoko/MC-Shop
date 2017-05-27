@@ -1,0 +1,79 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using MC.NetCore.DomainModels.Dto;
+using MC.NetCore.DataAccessSqlServerProvider;
+using MC.NetCore.DomainModels;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+
+namespace MC.NetCore.Repository
+{
+    public class ProductRepository :Repository<ProductLibrary>, IProductRepository,IDisposable
+    {
+        private readonly ShopDbContext _shopDbContext;
+        public ProductRepository(ShopDbContext shopDbContext)
+        {
+            _shopDbContext = shopDbContext;
+        }
+
+        public async Task<IList<ProductLibrary>> GetProductListByShopId(HashSet<int> shopIds)
+        {        
+            return await (from p in _shopDbContext.ProductLibrary.AsNoTracking()
+                          where shopIds.Contains(p.SpId.HasValue ? p.SpId.Value : 0)
+                          select p).ToListAsync();
+        }
+
+        public async Task<ProductLibrary> GetProductListByProductId(int productId)
+        {
+            return await (from p in _shopDbContext.ProductLibrary.AsNoTracking()
+                          where productId == p.ProductId
+                          select p).FirstOrDefaultAsync();
+        }
+
+        public async Task<IList<DeliveryProductDto>> GetDeliveryProductList(int shopId)
+        {
+            var query = await (from p in _shopDbContext.ProductLibrary.AsNoTracking()
+                               join px in _shopDbContext.ProductExtense.AsNoTracking()
+                               on p.SpId equals px.ShopId
+                              where p.SpId == shopId
+                              && p.Astatus == 1
+                              && p.IsAvailable == true
+                               select new DeliveryProductDto
+                              {
+                                  ProductId = p.ProductId,
+                                  ProductName = p.ProductName,
+                                  FullAmount = px.TotalCount?? px.TotalCount.Value,
+                                  RemainderAmount = 5,
+                                  RecommendOnShelvesAmount = px.TotalCount ?? px.TotalCount.Value
+                              }).ToListAsync();
+            return query;
+        }
+
+        public async Task<IList<ProductDto>> GetProductList(int shopId, DateTime? lastPickTime, DateTime? pickTime)
+        {
+            var query =await (from p in _shopDbContext.ProductLibrary.AsNoTracking()
+                              join s in _shopDbContext.OrderItemDetails.AsNoTracking()
+                              on p.ProductId equals s.ProductId
+                         where p.SpId == shopId
+                         && p.Astatus==1
+                         && p.IsAvailable == true
+                         && s.Dt >= lastPickTime
+                         && s.Dt <= pickTime
+                         group s by s.ProductId into g
+                         select new ProductDto
+                         {
+                             ProductId = g.Key==null?0:g.Key.Value,
+                             ProductName = (from a in _shopDbContext.ProductLibrary.AsNoTracking()
+                                            where a.ProductId == g.Key.Value
+                                            select a.ProductName).FirstOrDefault(),
+                             AllSaleAmount = (_shopDbContext.OrderItemDetails
+                                                .Where(a=>a.ProductId==g.Key.Value)
+                                                .Sum(a=>a.Quantity).Value),
+                             PickAmount = 0,
+                         }).ToListAsync();
+            return query;
+        }
+    }
+}

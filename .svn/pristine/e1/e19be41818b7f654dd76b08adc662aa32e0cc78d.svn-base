@@ -1,0 +1,236 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using MC.NetCore.Repository;
+using MC.NetCore.DomainModels.RequestDto;
+using MC.NetCore.DomainModels;
+using MC.NetCore.Repository.Enums;
+using Microsoft.AspNetCore.Cors;
+using MC.NetCore.ShopApp.ResponseBaseDto;
+using MC.NetCore.ShopApp.Filters;
+using MC.NetCore.DomainModels.Dto;
+using MC.NetCore.ShopApp.Extension;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+
+namespace MC.NetCore.ShopApp.Controllers
+{
+    [Route("api/[controller]/[action]")]
+    [EnableCors("AllowAnyDomain")]
+    [LoginCheckFilter(IsCheck = true)]
+    public class DeliverController : Controller
+    {
+        private readonly IShopRepository _shopRepository;
+        private readonly IProductRepository _productRepository;
+        private readonly IOperationRepository _optRepository;
+        private readonly IShopUserRepository _shopUserRepository;
+        private readonly IStoreRepository _storeRepostory;
+        private ILogger<DeliverController> _logger;
+
+
+        private UserDto currentUser
+        {
+            get
+            {
+                var user = HttpContext.Session.Get<UserDto>("user");
+                if (user == null)
+                {
+                    var token = HttpContext.Request.Headers["token"];
+                    user = JsonConvert.DeserializeObject<UserDto>(token) as UserDto;
+                    if(user!=null && !string.IsNullOrWhiteSpace(user.UserId) && 
+                        !string.IsNullOrWhiteSpace(user.UserName)){
+                        return user;
+                    }
+                    return null;
+                }
+                return user;
+            }
+
+        }
+        public DeliverController(IShopRepository shopRepository
+            , IProductRepository productRepository
+            , IOperationRepository optRepository
+            , IShopUserRepository shopUserRepository
+            , IStoreRepository storeRepostory
+            , ILogger<DeliverController> logger)
+        {
+            _shopRepository = shopRepository;
+            _productRepository = productRepository;
+            _optRepository = optRepository;
+            _shopUserRepository = shopUserRepository;
+            _storeRepostory = storeRepostory;
+            _logger = logger;
+        }
+        [HttpGet]
+        public IActionResult Index()
+        {
+            var list = _shopRepository.GetDeliverShopList().GetAwaiter().GetResult();
+            
+            return new ObjectResult(new BaseResult
+            {
+                StatusCode = Response.StatusCode,
+                Value = list
+            });
+        }
+
+
+        /// <summary>
+        /// 获取配送员列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> GetDeliverList()
+        {
+            var list = await _shopUserRepository.GetDeliverList();
+            return new ObjectResult(new BaseResult
+            {
+                StatusCode = Response.StatusCode,
+                Value = list
+            });
+        }
+
+
+        /// <summary>
+        /// 配送员商品列表
+        /// </summary>
+        /// <param name="shopId"></param>
+        /// <returns></returns>
+        public IActionResult DeliverProducts(int? shopId)
+        {
+            if (!shopId.HasValue)
+                throw new ArgumentNullException(nameof(shopId));
+            var list = _productRepository.GetDeliveryProductList2(shopId.Value).GetAwaiter().GetResult();
+            return new ObjectResult(new BaseResult
+            {
+                StatusCode = Response.StatusCode,
+                Value = list
+            });
+        }
+
+        /// <summary>
+        /// 上货页面
+        /// </summary>
+        /// <param name="shopId">店铺Id</param>
+        /// <returns></returns>
+        [HttpGet]
+        public IActionResult OnShelvesProducts(int? shopId)
+        {
+            if (!shopId.HasValue)
+                throw new ArgumentNullException(nameof(shopId));
+            var list = _productRepository.GetDeliveryProductList(shopId.Value).GetAwaiter().GetResult();
+            return new ObjectResult(new BaseResult
+            {
+                StatusCode = Response.StatusCode,
+                Value = list
+            });
+        }
+
+
+        /// <summary>
+        /// 盘点页面
+        /// </summary>
+        /// <param name="shopId">店铺Id</param>
+        /// <returns></returns>
+        public IActionResult CheckStoreProducts(int? shopId)
+        {
+            if (!shopId.HasValue)
+                throw new ArgumentNullException(nameof(shopId));
+            var list = _productRepository.GetDeliveryProductList(shopId.Value).GetAwaiter().GetResult();
+
+            foreach(var a in list)
+            {
+                //设置盘点时，实际余量为理论库存量
+                a.RecommendOnShelvesAmount = a.RemainderAmount;
+            }
+
+            return new ObjectResult(new BaseResult
+            {
+                StatusCode = Response.StatusCode,
+                Value = list
+            });
+        }
+
+
+        /// <summary>
+        /// 支持上货，下货，盘点
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> OperationProducts([FromBody]OperationProductsRequestDto model)
+        {
+            if (model.ProductList.Count <= 0)
+                throw new ArgumentNullException(nameof(model));
+            List<BoutiqueOperationLog> list = new List<BoutiqueOperationLog>();
+
+            List<StoreRequestDto> requestList = new List<StoreRequestDto>();
+            try
+            {
+                foreach (var x in model.ProductList)
+                {
+                    //下架操作，检查下架量是否大于库存量
+                    if(model.OperationType== (int)OperationTypeEnum.OffShelves || model.OperationType == (int)OperationTypeEnum.SoldOut)
+                    {
+                        if(x.ProductCount > x.RemainCount)
+                        {
+                            return new ObjectResult(new BaseResult
+                            {
+                                StatusCode = 400,
+                                ErrorMessage = "下架量不能大于实际库存量！",
+                                Value = false
+                            });
+                        }
+
+                    }
+
+                    requestList.Add(new StoreRequestDto
+                    {
+                        ProductId = x.ProductId,
+                        ShopId = model.ShopId,
+                        StoreType = model.OperationType,
+                        ModifyCount = x.ProductCount
+                    });
+
+                    BoutiqueOperationLog entity = new BoutiqueOperationLog
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        DeliveryManId = currentUser?.UserId,
+                        DeliveryMan = currentUser?.UserName,
+                        OperationType = model.OperationType,
+                        ProductId = x.ProductId,
+                        ChangeCount = x.ProductCount,
+                        LostCount = (model.OperationType == (int)OperationTypeEnum.CheckStore ? (x.RemainCount - x.ProductCount) : 0),
+                        ShopId = model.ShopId,
+                        OperationDateTime = DateTime.Now
+                    };
+                    list.Add(entity);
+                }
+
+                var ok = await _storeRepostory.UpdateStore(requestList);
+
+                if (ok)
+                {
+                    var flag = await _optRepository.CreateAsync(list);
+                }
+                return new ObjectResult(new BaseResult
+                {
+                    StatusCode = Response.StatusCode,
+                    Value = ok
+                });
+
+            }
+            catch(Exception ex)
+            {
+                return new ObjectResult(new BaseResult
+                {
+                    StatusCode = Response.StatusCode,
+                    ErrorMessage = ex.Message
+                });
+            }
+            
+        }
+
+
+    }
+}

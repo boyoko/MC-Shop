@@ -1,0 +1,255 @@
+2017-04-27 10:46:36.1880|59|Microsoft.Extensions.DependencyInjection.DataProtectionServices|WARN|Neither user profile nor HKLM registry available. Using an ephemeral key repository. Protected data will be unavailable when application exits. 
+2017-04-27 10:46:36.3486|50|Microsoft.AspNetCore.DataProtection.Repositories.EphemeralXmlRepository|WARN|Using an in-memory repository. Keys will not be persisted to storage. 
+2017-04-27 10:46:36.4112|3|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting starting 
+2017-04-27 10:46:36.7747|4|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting started 
+2017-04-27 10:46:36.8051|1|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4D2UFQ1SA7" started. 
+2017-04-27 10:46:36.9245|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:18888/api/Deliver/index application/json  
+2017-04-27 10:46:36.9848|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path /api/Deliver/index does not match a supported file type 
+2017-04-27 10:46:37.0185|5|Microsoft.AspNetCore.DataProtection.KeyManagement.KeyRingBasedDataProtector|TRACE|Performing unprotect operation to key {709705e6-b5f9-4932-978a-e6e84e91730a} with purposes ('E:\SourceCode\shop\MC.NetCore.ShopApp\bin\Debug\netcoreapp1.1\publish', 'SessionMiddleware'). 
+2017-04-27 10:46:37.0341|53|Microsoft.AspNetCore.DataProtection.KeyManagement.DefaultKeyResolver|DEBUG|Repository contains no viable default key. Caller should generate a key with immediate activation. 
+2017-04-27 10:46:37.0341|57|Microsoft.AspNetCore.DataProtection.KeyManagement.KeyRingProvider|DEBUG|Policy resolution states that a new key should be added to the key ring. 
+2017-04-27 10:46:37.0497|58|Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager|INFO|Creating key {3a0d0550-04e7-4e90-baf8-16c0812e00de} with creation date 2017-04-27 02:46:37Z, activation date 2017-04-27 02:46:37Z, and expiration date 2017-07-26 02:46:37Z. 
+2017-04-27 10:46:37.0653|32|Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager|DEBUG|Descriptor deserializer type for key {3a0d0550-04e7-4e90-baf8-16c0812e00de} is 'Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.AuthenticatedEncryptorDescriptorDeserializer, Microsoft.AspNetCore.DataProtection, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60'. 
+2017-04-27 10:46:37.0653|34|Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager|DEBUG|No key escrow sink found. Not writing key {3a0d0550-04e7-4e90-baf8-16c0812e00de} to escrow. 
+2017-04-27 10:46:37.0653|35|Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager|WARN|No XML encryptor configured. Key {3a0d0550-04e7-4e90-baf8-16c0812e00de} may be persisted to storage in unencrypted form. 
+2017-04-27 10:46:37.0810|23|Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager|DEBUG|Key cache expiration token triggered by 'CreateNewKey' operation. 
+2017-04-27 10:46:37.0810|18|Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager|DEBUG|Found key {3a0d0550-04e7-4e90-baf8-16c0812e00de}. 
+2017-04-27 10:46:37.0967|13|Microsoft.AspNetCore.DataProtection.KeyManagement.DefaultKeyResolver|DEBUG|Considering key {3a0d0550-04e7-4e90-baf8-16c0812e00de} with expiration date 2017-07-26 02:46:37Z as default key. 
+2017-04-27 10:46:37.1122|4|Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.CngCbcAuthenticatedEncryptorDescriptor|DEBUG|Opening CNG algorithm 'AES' from provider '(null)' with chaining mode CBC. 
+2017-04-27 10:46:37.1278|3|Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.CngCbcAuthenticatedEncryptorDescriptor|DEBUG|Opening CNG algorithm 'SHA256' from provider '(null)' with HMAC. 
+2017-04-27 10:46:37.1435|2|Microsoft.AspNetCore.DataProtection.KeyManagement.KeyRingProvider|DEBUG|Using key {3a0d0550-04e7-4e90-baf8-16c0812e00de} as the default key. 
+2017-04-27 10:46:37.1435|6|Microsoft.AspNetCore.DataProtection.KeyManagement.KeyRingBasedDataProtector|TRACE|Key {709705e6-b5f9-4932-978a-e6e84e91730a} was not found in the key ring. Unprotect operation cannot proceed. 
+2017-04-27 10:46:37.1747|7|Microsoft.AspNetCore.Session.SessionMiddleware|WARN|Error unprotecting the session cookie. The key {709705e6-b5f9-4932-978a-e6e84e91730a} was not found in the key ring.
+2017-04-27 10:46:37.1747|31|Microsoft.AspNetCore.DataProtection.KeyManagement.KeyRingBasedDataProtector|TRACE|Performing protect operation to key {3a0d0550-04e7-4e90-baf8-16c0812e00de} with purposes ('E:\SourceCode\shop\MC.NetCore.ShopApp\bin\Debug\netcoreapp1.1\publish', 'SessionMiddleware'). 
+2017-04-27 10:46:37.5159|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/Deliver/Index'. 
+2017-04-27 10:46:37.6096|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.DeliverController.Index (MC.NetCore.ShopApp) 
+2017-04-27 10:46:37.7659|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.DeliverController.Index (MC.NetCore.ShopApp) with arguments ((null)) - ModelState is Valid 
+2017-04-27 10:46:38.7039|2|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Compiling query model: 
+'(from GoodsPickingBatch <generated>_1 in DbSet<GoodsPickingBatch>
+select <generated>_1)
+.FirstOrDefault()' 
+2017-04-27 10:46:38.7351|3|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Optimized query model: 
+'(from GoodsPickingBatch <generated>_1 in DbSet<GoodsPickingBatch>
+select <generated>_1)
+.FirstOrDefault()' 
+2017-04-27 10:46:39.1568|5|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|TRACKED: True
+(QueryContext queryContext) => IEnumerable<GoodsPickingBatch> _ToSequence(
+    element: GoodsPickingBatch FirstOrDefault(
+        source: IEnumerable<GoodsPickingBatch> _ShapedQuery(
+            queryContext: queryContext, 
+            shaperCommandContext: SelectExpression: 
+                SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+                FROM [GoodsPickingBatch] AS [g]
+            , 
+            shaper: UnbufferedEntityShaper<GoodsPickingBatch>
+        )
+    )
+)
+ 
+2017-04-27 10:46:39.2037|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-27 10:46:39.5635|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (34ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+FROM [GoodsPickingBatch] AS [g] 
+2017-04-27 10:46:39.5947|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-27 10:46:39.6572|2|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Compiling query model: 
+'from Shop shop in 
+    (from Shop <generated>_1 in DbSet<Shop>
+    select <generated>_1)
+    .AsNoTracking()
+where shop.CourseTypeIds == "2561" && shop.IsEnable == True
+select new DeliveryShopDto{ 
+    0DeliveryStatus = 0, 
+    shop.ShopIdShopId = [shop].ShopId, 
+    shop.ShopNameShopName = [shop].ShopName, 
+    0Surplus = 0, 
+    "获取定位失败！"Distance = "获取定位失败！" 
+}
+' 
+2017-04-27 10:46:39.6729|3|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Optimized query model: 
+'from Shop shop in DbSet<Shop>
+where shop.CourseTypeIds == "2561" && shop.IsEnable == True
+select new DeliveryShopDto{ 
+    0DeliveryStatus = 0, 
+    shop.ShopIdShopId = [shop].ShopId, 
+    shop.ShopNameShopName = [shop].ShopName, 
+    0Surplus = 0, 
+    "获取定位失败！"Distance = "获取定位失败！" 
+}
+' 
+2017-04-27 10:46:39.7510|5|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|TRACKED: True
+(QueryContext queryContext) => IAsyncEnumerable<DeliveryShopDto> _Select(
+    source: IAsyncEnumerable<ValueBuffer> _ShapedQuery(
+        queryContext: queryContext, 
+        shaperCommandContext: SelectExpression: 
+            SELECT [shop].[shopID], [shop].[shopName]
+            FROM [Shop] AS [shop]
+            WHERE ([shop].[courseTypeIds] = '2561') AND ([shop].[IsEnable] = 1)
+        , 
+        shaper: ValueBufferShaper
+    )
+    , 
+    selector: (ValueBuffer shop) => new DeliveryShopDto{ 
+        0DeliveryStatus = 0, 
+        int TryReadValue(
+            valueBuffer: shop, 
+            index: 0, 
+            property: null
+        )
+        ShopId = TryReadValue(shop, 0, null), 
+        string TryReadValue(
+            valueBuffer: shop, 
+            index: 1, 
+            property: null
+        )
+        ShopName = TryReadValue(shop, 1, null), 
+        0Surplus = 0, 
+        "获取定位失败！"Distance = "获取定位失败！" 
+    }
+)
+ 
+2017-04-27 10:46:39.7869|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-27 10:46:39.8270|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (25ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [shop].[shopID], [shop].[shopName]
+FROM [Shop] AS [shop]
+WHERE ([shop].[courseTypeIds] = '2561') AND ([shop].[IsEnable] = 1) 
+2017-04-27 10:46:39.8462|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-27 10:46:39.8619|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.DeliverController.Index (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-27 10:46:39.8931|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-27 10:46:39.9087|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-27 10:46:39.9087|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-27 10:46:40.1721|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.DeliverController.Index (MC.NetCore.ShopApp) in 2563.7497ms 
+2017-04-27 10:46:40.2034|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4D2UFQ1SA7" completed keep alive response. 
+2017-04-27 10:46:40.2190|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 3329.5004ms 200 application/json; charset=utf-8 
+2017-04-27 10:46:58.4108|5|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting shutdown 
+2017-04-27 10:46:58.4765|10|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4D2UFQ1SA7" disconnecting. 
+2017-04-27 10:46:58.4765|7|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4D2UFQ1SA7" sending FIN. 
+2017-04-27 10:46:58.5005|8|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4D2UFQ1SA7" sent FIN with status "0". 
+2017-04-27 10:46:58.5005|2|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4D2UFQ1SA7" stopped. 
+2017-04-27 10:52:17.4431|59|Microsoft.Extensions.DependencyInjection.DataProtectionServices|WARN|Neither user profile nor HKLM registry available. Using an ephemeral key repository. Protected data will be unavailable when application exits. 
+2017-04-27 10:52:17.4813|50|Microsoft.AspNetCore.DataProtection.Repositories.EphemeralXmlRepository|WARN|Using an in-memory repository. Keys will not be persisted to storage. 
+2017-04-27 10:52:17.5365|3|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting starting 
+2017-04-27 10:52:17.6329|4|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting started 
+2017-04-27 10:52:17.8961|1|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4D31LES8UC" started. 
+2017-04-27 10:52:18.0033|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 POST http://localhost:18888/api/Deliver/index application/json 0 
+2017-04-27 10:52:18.0699|1|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|POST requests are not supported 
+2017-04-27 10:52:18.0855|5|Microsoft.AspNetCore.DataProtection.KeyManagement.KeyRingBasedDataProtector|TRACE|Performing unprotect operation to key {709705e6-b5f9-4932-978a-e6e84e91730a} with purposes ('E:\SourceCode\shop\MC.NetCore.ShopApp\bin\Debug\netcoreapp1.1\publish', 'SessionMiddleware'). 
+2017-04-27 10:52:18.1168|53|Microsoft.AspNetCore.DataProtection.KeyManagement.DefaultKeyResolver|DEBUG|Repository contains no viable default key. Caller should generate a key with immediate activation. 
+2017-04-27 10:52:18.1324|57|Microsoft.AspNetCore.DataProtection.KeyManagement.KeyRingProvider|DEBUG|Policy resolution states that a new key should be added to the key ring. 
+2017-04-27 10:52:18.1324|58|Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager|INFO|Creating key {dcef42e3-e8d3-42af-a4b5-7e9d349397a6} with creation date 2017-04-27 02:52:18Z, activation date 2017-04-27 02:52:18Z, and expiration date 2017-07-26 02:52:18Z. 
+2017-04-27 10:52:18.1637|32|Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager|DEBUG|Descriptor deserializer type for key {dcef42e3-e8d3-42af-a4b5-7e9d349397a6} is 'Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.AuthenticatedEncryptorDescriptorDeserializer, Microsoft.AspNetCore.DataProtection, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60'. 
+2017-04-27 10:52:18.1637|34|Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager|DEBUG|No key escrow sink found. Not writing key {dcef42e3-e8d3-42af-a4b5-7e9d349397a6} to escrow. 
+2017-04-27 10:52:18.1793|35|Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager|WARN|No XML encryptor configured. Key {dcef42e3-e8d3-42af-a4b5-7e9d349397a6} may be persisted to storage in unencrypted form. 
+2017-04-27 10:52:18.1793|23|Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager|DEBUG|Key cache expiration token triggered by 'CreateNewKey' operation. 
+2017-04-27 10:52:18.1949|18|Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager|DEBUG|Found key {dcef42e3-e8d3-42af-a4b5-7e9d349397a6}. 
+2017-04-27 10:52:18.1949|13|Microsoft.AspNetCore.DataProtection.KeyManagement.DefaultKeyResolver|DEBUG|Considering key {dcef42e3-e8d3-42af-a4b5-7e9d349397a6} with expiration date 2017-07-26 02:52:18Z as default key. 
+2017-04-27 10:52:18.2261|4|Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.CngCbcAuthenticatedEncryptorDescriptor|DEBUG|Opening CNG algorithm 'AES' from provider '(null)' with chaining mode CBC. 
+2017-04-27 10:52:18.2418|3|Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.CngCbcAuthenticatedEncryptorDescriptor|DEBUG|Opening CNG algorithm 'SHA256' from provider '(null)' with HMAC. 
+2017-04-27 10:52:18.2574|2|Microsoft.AspNetCore.DataProtection.KeyManagement.KeyRingProvider|DEBUG|Using key {dcef42e3-e8d3-42af-a4b5-7e9d349397a6} as the default key. 
+2017-04-27 10:52:18.2574|6|Microsoft.AspNetCore.DataProtection.KeyManagement.KeyRingBasedDataProtector|TRACE|Key {709705e6-b5f9-4932-978a-e6e84e91730a} was not found in the key ring. Unprotect operation cannot proceed. 
+2017-04-27 10:52:18.2731|7|Microsoft.AspNetCore.Session.SessionMiddleware|WARN|Error unprotecting the session cookie. The key {709705e6-b5f9-4932-978a-e6e84e91730a} was not found in the key ring.
+2017-04-27 10:52:18.2887|31|Microsoft.AspNetCore.DataProtection.KeyManagement.KeyRingBasedDataProtector|TRACE|Performing protect operation to key {dcef42e3-e8d3-42af-a4b5-7e9d349397a6} with purposes ('E:\SourceCode\shop\MC.NetCore.ShopApp\bin\Debug\netcoreapp1.1\publish', 'SessionMiddleware'). 
+2017-04-27 10:52:18.4837|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/Deliver/Index'. 
+2017-04-27 10:52:18.5562|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.DeliverController.Index (MC.NetCore.ShopApp) 
+2017-04-27 10:52:18.7124|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.DeliverController.Index (MC.NetCore.ShopApp) with arguments ((null)) - ModelState is Valid 
+2017-04-27 10:52:19.3654|2|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Compiling query model: 
+'(from GoodsPickingBatch <generated>_1 in DbSet<GoodsPickingBatch>
+select <generated>_1)
+.FirstOrDefault()' 
+2017-04-27 10:52:19.3810|3|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Optimized query model: 
+'(from GoodsPickingBatch <generated>_1 in DbSet<GoodsPickingBatch>
+select <generated>_1)
+.FirstOrDefault()' 
+2017-04-27 10:52:19.6016|5|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|TRACKED: True
+(QueryContext queryContext) => IEnumerable<GoodsPickingBatch> _ToSequence(
+    element: GoodsPickingBatch FirstOrDefault(
+        source: IEnumerable<GoodsPickingBatch> _ShapedQuery(
+            queryContext: queryContext, 
+            shaperCommandContext: SelectExpression: 
+                SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+                FROM [GoodsPickingBatch] AS [g]
+            , 
+            shaper: UnbufferedEntityShaper<GoodsPickingBatch>
+        )
+    )
+)
+ 
+2017-04-27 10:52:19.6797|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-27 10:52:19.9275|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (46ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+FROM [GoodsPickingBatch] AS [g] 
+2017-04-27 10:52:19.9588|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-27 10:52:20.0534|2|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Compiling query model: 
+'from Shop shop in 
+    (from Shop <generated>_1 in DbSet<Shop>
+    select <generated>_1)
+    .AsNoTracking()
+where shop.CourseTypeIds == "2561" && shop.IsEnable == True
+select new DeliveryShopDto{ 
+    0DeliveryStatus = 0, 
+    shop.ShopIdShopId = [shop].ShopId, 
+    shop.ShopNameShopName = [shop].ShopName, 
+    0Surplus = 0, 
+    "获取定位失败！"Distance = "获取定位失败！" 
+}
+' 
+2017-04-27 10:52:20.0702|3|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Optimized query model: 
+'from Shop shop in DbSet<Shop>
+where shop.CourseTypeIds == "2561" && shop.IsEnable == True
+select new DeliveryShopDto{ 
+    0DeliveryStatus = 0, 
+    shop.ShopIdShopId = [shop].ShopId, 
+    shop.ShopNameShopName = [shop].ShopName, 
+    0Surplus = 0, 
+    "获取定位失败！"Distance = "获取定位失败！" 
+}
+' 
+2017-04-27 10:52:20.1483|5|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|TRACKED: True
+(QueryContext queryContext) => IAsyncEnumerable<DeliveryShopDto> _Select(
+    source: IAsyncEnumerable<ValueBuffer> _ShapedQuery(
+        queryContext: queryContext, 
+        shaperCommandContext: SelectExpression: 
+            SELECT [shop].[shopID], [shop].[shopName]
+            FROM [Shop] AS [shop]
+            WHERE ([shop].[courseTypeIds] = '2561') AND ([shop].[IsEnable] = 1)
+        , 
+        shaper: ValueBufferShaper
+    )
+    , 
+    selector: (ValueBuffer shop) => new DeliveryShopDto{ 
+        0DeliveryStatus = 0, 
+        int TryReadValue(
+            valueBuffer: shop, 
+            index: 0, 
+            property: null
+        )
+        ShopId = TryReadValue(shop, 0, null), 
+        string TryReadValue(
+            valueBuffer: shop, 
+            index: 1, 
+            property: null
+        )
+        ShopName = TryReadValue(shop, 1, null), 
+        0Surplus = 0, 
+        "获取定位失败！"Distance = "获取定位失败！" 
+    }
+)
+ 
+2017-04-27 10:52:20.1640|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-27 10:52:20.2109|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (24ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [shop].[shopID], [shop].[shopName]
+FROM [Shop] AS [shop]
+WHERE ([shop].[courseTypeIds] = '2561') AND ([shop].[IsEnable] = 1) 
+2017-04-27 10:52:20.2421|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-27 10:52:20.2577|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.DeliverController.Index (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-27 10:52:20.2890|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-27 10:52:20.3034|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-27 10:52:20.3034|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-27 10:52:20.5476|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.DeliverController.Index (MC.NetCore.ShopApp) in 1984.2073ms 
+2017-04-27 10:52:20.5558|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4D31LES8UC" completed keep alive response. 
+2017-04-27 10:52:20.5714|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 2588.1042ms 200 application/json; charset=utf-8 
+2017-04-27 10:53:56.7914|6|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4D31LES8UC" received FIN. 
+2017-04-27 10:53:56.7914|10|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4D31LES8UC" disconnecting. 
+2017-04-27 10:53:56.8151|7|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4D31LES8UC" sending FIN. 
+2017-04-27 10:53:56.8311|8|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4D31LES8UC" sent FIN with status "0". 
+2017-04-27 10:53:56.8432|2|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4D31LES8UC" stopped. 
+2017-04-27 11:07:12.1866|5|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting shutdown 

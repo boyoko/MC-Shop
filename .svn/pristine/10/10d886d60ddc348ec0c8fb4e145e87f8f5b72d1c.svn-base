@@ -1,0 +1,59 @@
+﻿using MC.NetCore.DataAccessSqlServerProvider;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Text;
+using System.Linq;
+using System.Collections.Generic;
+using MC.NetCore.DomainModels;
+
+namespace MC.NetCore.InitDataConsole
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            System.Text.Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            var optionsBuilder = new DbContextOptionsBuilder<ShopDbContext>();
+            optionsBuilder.UseSqlServer(@"Data Source=123.57.21.63;Initial Catalog=OnlineFruit_Upgrade_V2;User ID=sa;Password=Happy2016;MultipleActiveResultSets=true");
+
+            using (var db = new ShopDbContext(optionsBuilder.Options))
+            {
+                var productList = (from p in db.ProductLibrary.AsNoTracking()
+                            join s in db.Shop.AsNoTracking()
+                            on p.SpId equals s.ShopId
+                            where (s.CourseTypeIds == "2561" || s.CourseTypeIds == "2561,")
+                            //&& s.IsEnable.Value == true
+                            //&& s.Astatus == 0
+                            //&& p.Astatus == 0
+                            //&& p.IsAvailable == true
+                            select p
+                            ).ToList();
+
+
+                List<ProductExtense> pextList = new List<ProductExtense>();
+                foreach (var product in productList)
+                {
+                    ProductExtense pex = new ProductExtense
+                    {
+                        ProductId = product.ProductId,
+                        ShopId = product.SpId.Value,
+                        CurrentCount = 5,       //初始化库存全部为0
+                        TotalCount = 10         //初始化饱和量
+                    };
+
+                    pextList.Add(pex);
+                }
+                Console.WriteLine("商品数量："+ pextList.Count);
+                db.ProductExtense.AddRange(pextList);
+                db.SaveChanges();
+                Console.WriteLine("同步完毕！");
+
+            }
+
+
+
+
+            Console.ReadKey();
+        }
+    }
+}

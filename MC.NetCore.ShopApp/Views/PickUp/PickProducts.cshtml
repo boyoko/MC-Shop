@@ -1,0 +1,124 @@
+﻿@using MC.NetCore.DomainModels;
+@model IList<MC.NetCore.DomainModels.Dto.ProductDto>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>捡货列表</title>
+</head>
+<body>
+    <div>
+        <div>
+            <input type="text" placeholder="搜索名字" />
+            <input type="button" value="筛选" />
+            <input type="hidden" id="shopId" value="@ViewBag.ShopId"/>
+        </div>
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>名称</th>
+                        <th>累计销量</th>
+                        <th>实际捡货量</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        foreach (var s in Model)
+                        {
+                            <tr>
+                                <td><input type="hidden" value="@s.ProductId" /></td>
+                                <td>@s.ProductName</td>
+                                <td>@s.FullAmount</td>
+                                <td>
+                                    <input type="button" class="subtract" value="-" />
+                                    <input type="text" name="productCount" />
+                                    <input type="button" class="add" value="+" />
+                                </td>
+                            </tr>
+
+                        }
+                    }
+
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <input type="button" id="btnPickUp" value="确认完成" />
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script>
+        $(function() {
+            $('#btnPickUp').click(function () {
+                var objList = [];
+                var x = $("table tbody tr");
+                $(x).each(function (index, element) {
+                    //debugger;
+                    var id = $(this).find("td input[type='hidden']").eq(0)[0].value;
+                    var name = $(this).find("td").eq(1).text();
+                    var count = $(this).find("td input[type='text']").eq(0)[0].value;
+                    if (count == "" || count == 0) return true;
+                    var obj = {};
+                    obj.ProductId = id;
+                    obj.ProductName = name;
+                    obj.ProductCount = count;
+                    objList.push(obj);
+                });
+
+                var model = {};
+                model.ProductList = objList;
+                model.ShopId = "@ViewBag.ShopId";
+                model.ShopName = "诚信小卖铺（折扣）";
+
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    //data: { list: objList },
+                    data: { model: model },
+                    url: "/PickUp/PickProducts",
+                    success: function (data, textStatus, jqXHR) {
+                        //data = true, textStatus = "success"
+                        if (data) {
+                            window.location.href = "/PickUp/Index";
+                        }
+                    },
+                    error: function (data, textStatus) {
+                        alert(textStatus);
+                    }
+                });
+
+
+            });
+
+            $(".add").on("click", function () {
+                var text = $(this).prev("input[type='text']")[0];
+                if ($(text).val() == "")
+                    $(text).val(0);
+                $(text).val(parseInt($(text).val()) + 1);
+
+            });
+
+            $(".subtract").on("click", function () {
+                debugger;
+                var text = $(this).siblings("input[type='text']")[0];
+                if ($(text).val() == "" || $(text).val() == 0)
+                    return;
+                $(text).val(parseInt($(text).val()) - 1);
+
+            });
+        });
+
+
+    </script>
+
+</body>
+</html>

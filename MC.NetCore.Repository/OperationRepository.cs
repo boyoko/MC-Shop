@@ -1,0 +1,55 @@
+﻿using MC.NetCore.DataAccessSqlServerProvider;
+using MC.NetCore.DomainModels;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using System.Linq;
+
+namespace MC.NetCore.Repository
+{
+    public class OperationRepository : Repository<BoutiqueOperationLog>, IOperationRepository
+    {
+
+        private readonly ShopDbContext _shopDbContext;
+        public OperationRepository(ShopDbContext context) : base(context)
+        {
+            _shopDbContext = context;
+        }
+        public virtual async Task<bool> CreateAsync(IList<BoutiqueOperationLog> operationList)
+        {
+            try
+            {
+                if (operationList != null && operationList.Count > 0)
+                {
+                    await _shopDbContext.AddRangeAsync(operationList);
+                    await _shopDbContext.SaveChangesAsync();
+                    return true;
+                }
+                else
+                {
+                    throw new ArgumentNullException(nameof(operationList));
+                }
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+            
+            
+        }
+
+        public async Task<IList<BoutiqueOperationLog>> GetBoutiqueOperationLog(DateTime beginDateTime,DateTime endDateTime)
+        {
+            return await (from p in _shopDbContext.BoutiqueOperationLog.AsNoTracking()
+                          where p.OperationDateTime >= beginDateTime && p.OperationDateTime <= endDateTime
+                          select p
+                          ).ToListAsync();
+        }
+    }
+
+
+
+
+}

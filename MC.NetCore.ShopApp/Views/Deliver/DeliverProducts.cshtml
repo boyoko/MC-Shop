@@ -1,0 +1,118 @@
+﻿@using MC.NetCore.DomainModels;
+@model IList<MC.NetCore.DomainModels.Dto.DeliveryProductDto>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>XXXX商铺名称</title>
+</head>
+<body>
+    <div>
+        <div>
+            <input type="text" placeholder="搜索名字" />
+            <input type="hidden" id="shopId" value="@ViewBag.ShopId" />
+        </div>
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>名称</th>
+                        <th>饱和量</th>
+                        <th>余量</th>
+                        <th>下架</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        foreach (var s in Model)
+                        {
+                            <tr>
+                                <td><input type="hidden" value="@s.ProductId" /></td>
+                                <td>@s.ProductName</td>
+                                <td>@s.FullAmount</td>
+                                <td>@s.RemainderAmount</td>
+                                <td>
+                                    <input type="button" class="offShelves" value="下架" />
+                                </td>
+                            </tr>
+
+                        }
+                    }
+
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <input type="button" id="btnOnShelves" value="上货" />
+            <input type="button" id="btnCheckStore" value="盘点" />
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script>
+        $(function () {
+            $('#btnOnShelves').on('click', function () {
+                var shopId = "@ViewBag.ShopId";
+                window.location.href = "/Deliver/OnShelvesProducts?shopId=" + shopId;
+            });
+            $('#btnCheckStore').on('click', function () {
+                var shopId = "@ViewBag.ShopId";
+                window.location.href = "/Deliver/CheckStoreProducts?shopId=" + shopId;
+            });
+
+
+            //下架，测试默认下架1个，
+            $('.offShelves').click(function () {
+                var objList = [];
+                //debugger;
+                var id = $(this).find("td input[type='hidden']").eq(0)[0].value;
+                var name = $(this).find("td").eq(1).text();
+                //var count = $(this).find("td input[type='text']").eq(0)[0].value;
+                var count = 1;
+                if (count == "" || count == 0) return;
+
+                var obj = {};
+                obj.ProductId = id;
+                obj.ProductName = name;
+                obj.ProductCount = count;  //
+                obj.RemainCount = 3; //余量
+                objList.push(obj);
+
+                var model = {};
+                model.ProductList = objList;
+                model.ShopId = "@ViewBag.ShopId";
+                model.OperationType = 2;   //下架（在售）  
+                //model.OperationType = 3;   //下架（禁售）  
+
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    data: { model: model },
+                    url: "/Deliver/OperationProducts",
+                    success: function (data, textStatus, jqXHR) {
+                        if (data) {
+                            window.location.reload;
+                        }
+                    },
+                    error: function (data, textStatus) {
+                        alert(textStatus);
+                    }
+                });
+
+
+            });
+
+        });
+
+
+    </script>
+
+</body>
+</html>

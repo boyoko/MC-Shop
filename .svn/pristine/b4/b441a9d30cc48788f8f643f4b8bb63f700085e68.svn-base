@@ -1,0 +1,1235 @@
+2017-04-25 13:01:52.0022|59|Microsoft.Extensions.DependencyInjection.DataProtectionServices|WARN|Neither user profile nor HKLM registry available. Using an ephemeral key repository. Protected data will be unavailable when application exits. 
+2017-04-25 13:01:52.0310|50|Microsoft.AspNetCore.DataProtection.Repositories.EphemeralXmlRepository|WARN|Using an in-memory repository. Keys will not be persisted to storage. 
+2017-04-25 13:01:52.0671|3|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting starting 
+2017-04-25 13:01:52.1428|1|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BJ0NUNQV2" started. 
+2017-04-25 13:01:52.1653|4|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting started 
+2017-04-25 13:01:52.2340|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://10.9.33.23:18888/api/pickup/index   
+2017-04-25 13:01:52.3540|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path /api/pickup/index does not match a supported file type 
+2017-04-25 13:01:52.6317|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/PickUp/Index'. 
+2017-04-25 13:01:52.7034|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) 
+2017-04-25 13:01:52.9867|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) with arguments ((null)) - ModelState is Valid 
+2017-04-25 13:01:53.5216|2|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Compiling query model: 
+'(from GoodsPickingBatch <generated>_1 in DbSet<GoodsPickingBatch>
+select <generated>_1)
+.FirstOrDefault()' 
+2017-04-25 13:01:53.5366|3|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Optimized query model: 
+'(from GoodsPickingBatch <generated>_1 in DbSet<GoodsPickingBatch>
+select <generated>_1)
+.FirstOrDefault()' 
+2017-04-25 13:01:53.7196|5|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|TRACKED: True
+(QueryContext queryContext) => IEnumerable<GoodsPickingBatch> _ToSequence(
+    element: GoodsPickingBatch FirstOrDefault(
+        source: IEnumerable<GoodsPickingBatch> _ShapedQuery(
+            queryContext: queryContext, 
+            shaperCommandContext: SelectExpression: 
+                SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+                FROM [GoodsPickingBatch] AS [g]
+            , 
+            shaper: UnbufferedEntityShaper<GoodsPickingBatch>
+        )
+    )
+)
+ 
+2017-04-25 13:01:53.7890|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 13:01:54.0071|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (33ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+FROM [GoodsPickingBatch] AS [g] 
+2017-04-25 13:01:54.0772|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 13:01:54.1289|2|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Compiling query model: 
+'(from ShopDto <generated>_2 in DbSet<ShopDto>
+select <generated>_2)
+.FromSql('SELECT * FROM
+                                (SELECT  ROW_NUMBER() OVER (PARTITION BY s.shopID ORDER BY b.PickTime DESC) AS Id
+                                ,s.shopID,s.shopName,b.PickTime,b.PickManId,b.PickMan
+                                ,(SELECT SUM(p.Price * d.PickAmount) 
+                                FROM dbo.ProductLibrary AS p
+                                INNER JOIN dbo.GoodsPickingDetail AS d
+                                ON p.ProductId=d.ProductID
+                                WHERE d.PickBatchID = b.ID)
+                                AS TotalAmount
+                                FROM dbo.Shop AS s
+                                LEFT OUTER JOIN dbo.GoodsPickingBatch AS b 
+                                ON b.ShopID = s.shopID
+                                WHERE s.courseTypeIds='2561'
+                                ) AS tmp 
+                                WHERE tmp.Id=1')
+.AsNoTracking()' 
+2017-04-25 13:01:54.1364|3|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Optimized query model: 
+'from ShopDto <generated>_2 in DbSet<ShopDto>
+select <generated>_2' 
+2017-04-25 13:01:54.1547|5|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|TRACKED: True
+(QueryContext queryContext) => IAsyncEnumerable<ShopDto> _ShapedQuery(
+    queryContext: queryContext, 
+    shaperCommandContext: SelectExpression: 
+        SELECT * FROM
+                                        (SELECT  ROW_NUMBER() OVER (PARTITION BY s.shopID ORDER BY b.PickTime DESC) AS Id
+                                        ,s.shopID,s.shopName,b.PickTime,b.PickManId,b.PickMan
+                                        ,(SELECT SUM(p.Price * d.PickAmount) 
+                                        FROM dbo.ProductLibrary AS p
+                                        INNER JOIN dbo.GoodsPickingDetail AS d
+                                        ON p.ProductId=d.ProductID
+                                        WHERE d.PickBatchID = b.ID)
+                                        AS TotalAmount
+                                        FROM dbo.Shop AS s
+                                        LEFT OUTER JOIN dbo.GoodsPickingBatch AS b 
+                                        ON b.ShopID = s.shopID
+                                        WHERE s.courseTypeIds='2561'
+                                        ) AS tmp 
+                                        WHERE tmp.Id=1
+    , 
+    shaper: UnbufferedEntityShaper<ShopDto>
+)
+ 
+2017-04-25 13:01:54.1832|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 13:01:54.2367|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (32ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT * FROM
+                                (SELECT  ROW_NUMBER() OVER (PARTITION BY s.shopID ORDER BY b.PickTime DESC) AS Id
+                                ,s.shopID,s.shopName,b.PickTime,b.PickManId,b.PickMan
+                                ,(SELECT SUM(p.Price * d.PickAmount) 
+                                FROM dbo.ProductLibrary AS p
+                                INNER JOIN dbo.GoodsPickingDetail AS d
+                                ON p.ProductId=d.ProductID
+                                WHERE d.PickBatchID = b.ID)
+                                AS TotalAmount
+                                FROM dbo.Shop AS s
+                                LEFT OUTER JOIN dbo.GoodsPickingBatch AS b 
+                                ON b.ShopID = s.shopID
+                                WHERE s.courseTypeIds='2561'
+                                ) AS tmp 
+                                WHERE tmp.Id=1 
+2017-04-25 13:01:54.2628|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 13:01:54.2628|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-25 13:01:54.3078|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-25 13:01:54.3208|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-25 13:01:54.3208|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-25 13:01:54.5953|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) in 1880.9178ms 
+2017-04-25 13:01:54.6179|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BJ0NUNQV2" completed keep alive response. 
+2017-04-25 13:01:54.6420|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 2423.568ms 200 application/json; charset=utf-8 
+2017-04-25 13:03:26.0679|6|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BJ0NUNQV2" received FIN. 
+2017-04-25 13:03:26.0870|10|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BJ0NUNQV2" disconnecting. 
+2017-04-25 13:03:26.1015|7|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BJ0NUNQV2" sending FIN. 
+2017-04-25 13:03:26.1201|8|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BJ0NUNQV2" sent FIN with status "0". 
+2017-04-25 13:03:26.1366|2|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BJ0NUNQV2" stopped. 
+2017-04-25 13:22:04.0381|5|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting shutdown 
+2017-04-25 14:08:52.2559|59|Microsoft.Extensions.DependencyInjection.DataProtectionServices|WARN|Neither user profile nor HKLM registry available. Using an ephemeral key repository. Protected data will be unavailable when application exits. 
+2017-04-25 14:08:52.2940|50|Microsoft.AspNetCore.DataProtection.Repositories.EphemeralXmlRepository|WARN|Using an in-memory repository. Keys will not be persisted to storage. 
+2017-04-25 14:08:52.3461|3|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting starting 
+2017-04-25 14:08:52.4294|4|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting started 
+2017-04-25 14:08:52.5276|1|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643TH8" started. 
+2017-04-25 14:08:52.6314|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://10.68.12.178:18888/api/Deliver/DeliverProducts   
+2017-04-25 14:08:52.7056|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path /api/Deliver/DeliverProducts does not match a supported file type 
+2017-04-25 14:08:52.8931|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/Deliver/DeliverProducts'. 
+2017-04-25 14:08:52.9763|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.DeliverController.DeliverProducts (MC.NetCore.ShopApp) 
+2017-04-25 14:08:53.1939|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.DeliverController.DeliverProducts (MC.NetCore.ShopApp) with arguments () - ModelState is Valid 
+2017-04-25 14:08:53.2320|1|Microsoft.AspNetCore.Mvc.Formatters.Json.Internal.JsonResultExecutor|INFO|Executing JsonResult, writing value MC.NetCore.ShopApp.ResponseBaseDto.BaseResult. 
+2017-04-25 14:08:53.4485|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.DeliverController.DeliverProducts (MC.NetCore.ShopApp) in 461.6023ms 
+2017-04-25 14:08:53.4681|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643TH8" completed keep alive response. 
+2017-04-25 14:08:53.4866|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 871.8063ms 500 application/json; charset=utf-8 
+2017-04-25 14:08:59.1494|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://10.68.12.178:18888/api/PickUp/Index   
+2017-04-25 14:08:59.1660|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path /api/PickUp/Index does not match a supported file type 
+2017-04-25 14:08:59.1785|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/PickUp/Index'. 
+2017-04-25 14:08:59.1945|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) 
+2017-04-25 14:08:59.2116|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) with arguments ((null)) - ModelState is Valid 
+2017-04-25 14:08:59.7616|2|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Compiling query model: 
+'(from GoodsPickingBatch <generated>_1 in DbSet<GoodsPickingBatch>
+select <generated>_1)
+.FirstOrDefault()' 
+2017-04-25 14:08:59.7811|3|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Optimized query model: 
+'(from GoodsPickingBatch <generated>_1 in DbSet<GoodsPickingBatch>
+select <generated>_1)
+.FirstOrDefault()' 
+2017-04-25 14:08:59.9676|5|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|TRACKED: True
+(QueryContext queryContext) => IEnumerable<GoodsPickingBatch> _ToSequence(
+    element: GoodsPickingBatch FirstOrDefault(
+        source: IEnumerable<GoodsPickingBatch> _ShapedQuery(
+            queryContext: queryContext, 
+            shaperCommandContext: SelectExpression: 
+                SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+                FROM [GoodsPickingBatch] AS [g]
+            , 
+            shaper: UnbufferedEntityShaper<GoodsPickingBatch>
+        )
+    )
+)
+ 
+2017-04-25 14:09:00.0158|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:09:00.2037|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (34ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+FROM [GoodsPickingBatch] AS [g] 
+2017-04-25 14:09:00.2784|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:09:00.3425|2|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Compiling query model: 
+'(from ShopDto <generated>_2 in DbSet<ShopDto>
+select <generated>_2)
+.FromSql('SELECT * FROM
+                                (SELECT  ROW_NUMBER() OVER (PARTITION BY s.shopID ORDER BY b.PickTime DESC) AS Id
+                                ,s.shopID,s.shopName,b.PickTime,b.PickManId,b.PickMan
+                                ,(SELECT SUM(p.Price * d.PickAmount) 
+                                FROM dbo.ProductLibrary AS p
+                                INNER JOIN dbo.GoodsPickingDetail AS d
+                                ON p.ProductId=d.ProductID
+                                WHERE d.PickBatchID = b.ID)
+                                AS TotalAmount
+                                FROM dbo.Shop AS s
+                                LEFT OUTER JOIN dbo.GoodsPickingBatch AS b 
+                                ON b.ShopID = s.shopID
+                                WHERE s.courseTypeIds='2561'
+                                ) AS tmp 
+                                WHERE tmp.Id=1')
+.AsNoTracking()' 
+2017-04-25 14:09:00.3515|3|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Optimized query model: 
+'from ShopDto <generated>_2 in DbSet<ShopDto>
+select <generated>_2' 
+2017-04-25 14:09:00.3751|5|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|TRACKED: True
+(QueryContext queryContext) => IAsyncEnumerable<ShopDto> _ShapedQuery(
+    queryContext: queryContext, 
+    shaperCommandContext: SelectExpression: 
+        SELECT * FROM
+                                        (SELECT  ROW_NUMBER() OVER (PARTITION BY s.shopID ORDER BY b.PickTime DESC) AS Id
+                                        ,s.shopID,s.shopName,b.PickTime,b.PickManId,b.PickMan
+                                        ,(SELECT SUM(p.Price * d.PickAmount) 
+                                        FROM dbo.ProductLibrary AS p
+                                        INNER JOIN dbo.GoodsPickingDetail AS d
+                                        ON p.ProductId=d.ProductID
+                                        WHERE d.PickBatchID = b.ID)
+                                        AS TotalAmount
+                                        FROM dbo.Shop AS s
+                                        LEFT OUTER JOIN dbo.GoodsPickingBatch AS b 
+                                        ON b.ShopID = s.shopID
+                                        WHERE s.courseTypeIds='2561'
+                                        ) AS tmp 
+                                        WHERE tmp.Id=1
+    , 
+    shaper: UnbufferedEntityShaper<ShopDto>
+)
+ 
+2017-04-25 14:09:00.4087|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:09:00.4623|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (33ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT * FROM
+                                (SELECT  ROW_NUMBER() OVER (PARTITION BY s.shopID ORDER BY b.PickTime DESC) AS Id
+                                ,s.shopID,s.shopName,b.PickTime,b.PickManId,b.PickMan
+                                ,(SELECT SUM(p.Price * d.PickAmount) 
+                                FROM dbo.ProductLibrary AS p
+                                INNER JOIN dbo.GoodsPickingDetail AS d
+                                ON p.ProductId=d.ProductID
+                                WHERE d.PickBatchID = b.ID)
+                                AS TotalAmount
+                                FROM dbo.Shop AS s
+                                LEFT OUTER JOIN dbo.GoodsPickingBatch AS b 
+                                ON b.ShopID = s.shopID
+                                WHERE s.courseTypeIds='2561'
+                                ) AS tmp 
+                                WHERE tmp.Id=1 
+2017-04-25 14:09:00.4949|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:09:00.5050|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-25 14:09:00.5345|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-25 14:09:00.5511|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-25 14:09:00.5626|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-25 14:09:00.6112|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) in 1407.2702ms 
+2017-04-25 14:09:00.6263|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643TH8" completed keep alive response. 
+2017-04-25 14:09:00.6263|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 1490.1634ms 200 application/json; charset=utf-8 
+2017-04-25 14:09:24.1864|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://10.68.12.178:18888/api/PickUp/Index   
+2017-04-25 14:09:24.2014|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path /api/PickUp/Index does not match a supported file type 
+2017-04-25 14:09:24.2225|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/PickUp/Index'. 
+2017-04-25 14:09:24.2595|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) 
+2017-04-25 14:09:24.2926|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) with arguments ((null)) - ModelState is Valid 
+2017-04-25 14:09:24.3147|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:09:24.3513|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (9ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+FROM [GoodsPickingBatch] AS [g] 
+2017-04-25 14:09:24.3703|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:09:24.3934|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:09:24.4099|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT * FROM
+                                (SELECT  ROW_NUMBER() OVER (PARTITION BY s.shopID ORDER BY b.PickTime DESC) AS Id
+                                ,s.shopID,s.shopName,b.PickTime,b.PickManId,b.PickMan
+                                ,(SELECT SUM(p.Price * d.PickAmount) 
+                                FROM dbo.ProductLibrary AS p
+                                INNER JOIN dbo.GoodsPickingDetail AS d
+                                ON p.ProductId=d.ProductID
+                                WHERE d.PickBatchID = b.ID)
+                                AS TotalAmount
+                                FROM dbo.Shop AS s
+                                LEFT OUTER JOIN dbo.GoodsPickingBatch AS b 
+                                ON b.ShopID = s.shopID
+                                WHERE s.courseTypeIds='2561'
+                                ) AS tmp 
+                                WHERE tmp.Id=1 
+2017-04-25 14:09:24.4280|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:09:24.4440|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-25 14:09:24.4626|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-25 14:09:24.4801|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-25 14:09:24.5002|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-25 14:09:24.5197|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) in 227.5459ms 
+2017-04-25 14:09:24.5398|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643TH8" completed keep alive response. 
+2017-04-25 14:09:24.5654|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 379.4349ms 200 application/json; charset=utf-8 
+2017-04-25 14:10:02.6805|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://10.68.12.178:18888/api/PickUp/PickProducts?shopid=10619&pickTime=2017%2F4%2F25+14%3A10%3A2&lastPickTime=2017-04-24+12%3A31%3A33.42   
+2017-04-25 14:10:02.7006|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path /api/PickUp/PickProducts does not match a supported file type 
+2017-04-25 14:10:02.7166|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/PickUp/PickProducts'. 
+2017-04-25 14:10:02.7337|2|Microsoft.AspNetCore.Mvc.Internal.ActionSelector|DEBUG|Action 'MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp)' with id '9fcaf410-3b24-4358-bcca-69eff3404abf' did not match the constraint 'Microsoft.AspNetCore.Mvc.Internal.HttpMethodActionConstraint' 
+2017-04-25 14:10:02.7482|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp) 
+2017-04-25 14:10:02.9009|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp) with arguments (10619, 2017/4/24 12:31:33, 2017/4/25 14:10:02) - ModelState is Valid 
+2017-04-25 14:10:02.9722|2|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Compiling query model: 
+'from ProductLibrary p in 
+    (from ProductLibrary <generated>_1 in DbSet<ProductLibrary>
+    select <generated>_1)
+    .AsNoTracking()
+where p.SpId == (Nullable<int>) __shopId_0
+select new ProductDto{ 
+    p.ProductIdProductId = [p].ProductId, 
+    p.ProductNameProductName = [p].ProductName, 
+    10AllSaleAmount = 10, 
+    0PickAmount = 0 
+}
+' 
+2017-04-25 14:10:03.0003|3|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Optimized query model: 
+'from ProductLibrary p in DbSet<ProductLibrary>
+where p.SpId == (Nullable<int>) __shopId_0
+select new ProductDto{ 
+    p.ProductIdProductId = [p].ProductId, 
+    p.ProductNameProductName = [p].ProductName, 
+    10AllSaleAmount = 10, 
+    0PickAmount = 0 
+}
+' 
+2017-04-25 14:10:03.0660|5|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|TRACKED: False
+(QueryContext queryContext) => IAsyncEnumerable<ProductDto> _Select(
+    source: IAsyncEnumerable<ValueBuffer> _ShapedQuery(
+        queryContext: queryContext, 
+        shaperCommandContext: SelectExpression: 
+            SELECT [p].[ProductId], [p].[productName]
+            FROM [ProductLibrary] AS [p]
+            WHERE [p].[spID] = @__shopId_0
+        , 
+        shaper: ValueBufferShaper
+    )
+    , 
+    selector: (ValueBuffer p) => new ProductDto{ 
+        int TryReadValue(
+            valueBuffer: p, 
+            index: 0, 
+            property: null
+        )
+        ProductId = TryReadValue(p, 0, null), 
+        string TryReadValue(
+            valueBuffer: p, 
+            index: 1, 
+            property: null
+        )
+        ProductName = TryReadValue(p, 1, null), 
+        10AllSaleAmount = 10, 
+        0PickAmount = 0 
+    }
+)
+ 
+2017-04-25 14:10:03.0660|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:10:03.1301|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (41ms) [Parameters=[@__shopId_0='?'], CommandType='Text', CommandTimeout='30']
+SELECT [p].[ProductId], [p].[productName]
+FROM [ProductLibrary] AS [p]
+WHERE [p].[spID] = @__shopId_0 
+2017-04-25 14:10:03.1301|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:10:03.1427|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-25 14:10:03.1427|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-25 14:10:03.1427|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-25 14:10:03.1607|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-25 14:10:03.1607|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp) in 406.9873ms 
+2017-04-25 14:10:03.1768|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643TH8" completed keep alive response. 
+2017-04-25 14:10:03.1768|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 504.9785ms 200 application/json; charset=utf-8 
+2017-04-25 14:12:03.4577|10|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643TH8" disconnecting. 
+2017-04-25 14:12:03.4577|7|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643TH8" sending FIN. 
+2017-04-25 14:12:03.4787|8|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643TH8" sent FIN with status "0". 
+2017-04-25 14:12:03.4918|2|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643TH8" stopped. 
+2017-04-25 14:13:26.1942|1|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643TH9" started. 
+2017-04-25 14:13:26.2072|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://10.68.12.178:18888/api/PickUp/Index   
+2017-04-25 14:13:26.2072|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path /api/PickUp/Index does not match a supported file type 
+2017-04-25 14:13:26.2313|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/PickUp/Index'. 
+2017-04-25 14:13:26.2433|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) 
+2017-04-25 14:13:26.2433|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) with arguments ((null)) - ModelState is Valid 
+2017-04-25 14:13:26.2634|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:13:26.2739|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+FROM [GoodsPickingBatch] AS [g] 
+2017-04-25 14:13:26.2980|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:13:26.3250|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:13:26.3712|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (14ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT * FROM
+                                (SELECT  ROW_NUMBER() OVER (PARTITION BY s.shopID ORDER BY b.PickTime DESC) AS Id
+                                ,s.shopID,s.shopName,b.PickTime,b.PickManId,b.PickMan
+                                ,(SELECT SUM(p.Price * d.PickAmount) 
+                                FROM dbo.ProductLibrary AS p
+                                INNER JOIN dbo.GoodsPickingDetail AS d
+                                ON p.ProductId=d.ProductID
+                                WHERE d.PickBatchID = b.ID)
+                                AS TotalAmount
+                                FROM dbo.Shop AS s
+                                LEFT OUTER JOIN dbo.GoodsPickingBatch AS b 
+                                ON b.ShopID = s.shopID
+                                WHERE s.courseTypeIds='2561'
+                                ) AS tmp 
+                                WHERE tmp.Id=1 
+2017-04-25 14:13:26.3857|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:13:26.3987|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-25 14:13:26.4133|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-25 14:13:26.4278|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-25 14:13:26.4419|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-25 14:13:26.4564|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) in 205.995ms 
+2017-04-25 14:13:26.4749|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643TH9" completed keep alive response. 
+2017-04-25 14:13:26.4935|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 286.2176ms 200 application/json; charset=utf-8 
+2017-04-25 14:13:47.9287|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://10.68.12.178:18888/api/PickUp/Index   
+2017-04-25 14:13:47.9497|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path /api/PickUp/Index does not match a supported file type 
+2017-04-25 14:13:47.9778|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/PickUp/Index'. 
+2017-04-25 14:13:48.0415|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) 
+2017-04-25 14:13:48.0660|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) with arguments ((null)) - ModelState is Valid 
+2017-04-25 14:13:48.0826|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:13:48.1011|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+FROM [GoodsPickingBatch] AS [g] 
+2017-04-25 14:13:48.1202|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:13:48.1382|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:13:48.1568|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT * FROM
+                                (SELECT  ROW_NUMBER() OVER (PARTITION BY s.shopID ORDER BY b.PickTime DESC) AS Id
+                                ,s.shopID,s.shopName,b.PickTime,b.PickManId,b.PickMan
+                                ,(SELECT SUM(p.Price * d.PickAmount) 
+                                FROM dbo.ProductLibrary AS p
+                                INNER JOIN dbo.GoodsPickingDetail AS d
+                                ON p.ProductId=d.ProductID
+                                WHERE d.PickBatchID = b.ID)
+                                AS TotalAmount
+                                FROM dbo.Shop AS s
+                                LEFT OUTER JOIN dbo.GoodsPickingBatch AS b 
+                                ON b.ShopID = s.shopID
+                                WHERE s.courseTypeIds='2561'
+                                ) AS tmp 
+                                WHERE tmp.Id=1 
+2017-04-25 14:13:48.1778|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:13:48.1984|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-25 14:13:48.2184|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-25 14:13:48.2370|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-25 14:13:48.2540|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-25 14:13:48.2691|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) in 203.1243ms 
+2017-04-25 14:13:48.2971|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643TH9" completed keep alive response. 
+2017-04-25 14:13:48.3217|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 392.7763ms 200 application/json; charset=utf-8 
+2017-04-25 14:15:48.5284|10|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643TH9" disconnecting. 
+2017-04-25 14:15:48.5454|7|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643TH9" sending FIN. 
+2017-04-25 14:15:48.5630|8|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643TH9" sent FIN with status "0". 
+2017-04-25 14:15:48.5855|2|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643TH9" stopped. 
+2017-04-25 14:16:13.0008|1|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THA" started. 
+2017-04-25 14:16:13.0209|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:18888/api/PickUp/Index   
+2017-04-25 14:16:13.0374|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path /api/PickUp/Index does not match a supported file type 
+2017-04-25 14:16:13.0529|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/PickUp/Index'. 
+2017-04-25 14:16:13.0715|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) 
+2017-04-25 14:16:13.0865|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) with arguments ((null)) - ModelState is Valid 
+2017-04-25 14:16:13.1041|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:16:13.1211|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+FROM [GoodsPickingBatch] AS [g] 
+2017-04-25 14:16:13.1387|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:16:13.1512|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:16:13.1761|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (11ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT * FROM
+                                (SELECT  ROW_NUMBER() OVER (PARTITION BY s.shopID ORDER BY b.PickTime DESC) AS Id
+                                ,s.shopID,s.shopName,b.PickTime,b.PickManId,b.PickMan
+                                ,(SELECT SUM(p.Price * d.PickAmount) 
+                                FROM dbo.ProductLibrary AS p
+                                INNER JOIN dbo.GoodsPickingDetail AS d
+                                ON p.ProductId=d.ProductID
+                                WHERE d.PickBatchID = b.ID)
+                                AS TotalAmount
+                                FROM dbo.Shop AS s
+                                LEFT OUTER JOIN dbo.GoodsPickingBatch AS b 
+                                ON b.ShopID = s.shopID
+                                WHERE s.courseTypeIds='2561'
+                                ) AS tmp 
+                                WHERE tmp.Id=1 
+2017-04-25 14:16:13.1917|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:16:13.2057|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-25 14:16:13.2222|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-25 14:16:13.2383|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-25 14:16:13.2563|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-25 14:16:13.2739|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) in 187.0766ms 
+2017-04-25 14:16:13.2924|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THA" completed keep alive response. 
+2017-04-25 14:16:13.3155|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 294.6853ms 200 application/json; charset=utf-8 
+2017-04-25 14:16:51.6755|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:18888/api/PickUp/Index   
+2017-04-25 14:16:51.7056|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path /api/PickUp/Index does not match a supported file type 
+2017-04-25 14:16:51.7277|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/PickUp/Index'. 
+2017-04-25 14:16:51.7528|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) 
+2017-04-25 14:16:51.7713|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) with arguments ((null)) - ModelState is Valid 
+2017-04-25 14:16:51.7893|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:16:51.8074|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+FROM [GoodsPickingBatch] AS [g] 
+2017-04-25 14:16:51.8244|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:16:51.8410|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:16:51.8701|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (12ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT * FROM
+                                (SELECT  ROW_NUMBER() OVER (PARTITION BY s.shopID ORDER BY b.PickTime DESC) AS Id
+                                ,s.shopID,s.shopName,b.PickTime,b.PickManId,b.PickMan
+                                ,(SELECT SUM(p.Price * d.PickAmount) 
+                                FROM dbo.ProductLibrary AS p
+                                INNER JOIN dbo.GoodsPickingDetail AS d
+                                ON p.ProductId=d.ProductID
+                                WHERE d.PickBatchID = b.ID)
+                                AS TotalAmount
+                                FROM dbo.Shop AS s
+                                LEFT OUTER JOIN dbo.GoodsPickingBatch AS b 
+                                ON b.ShopID = s.shopID
+                                WHERE s.courseTypeIds='2561'
+                                ) AS tmp 
+                                WHERE tmp.Id=1 
+2017-04-25 14:16:51.8881|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:16:51.9046|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-25 14:16:51.9232|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-25 14:16:51.9438|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-25 14:16:51.9613|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-25 14:16:51.9809|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) in 209.9506ms 
+2017-04-25 14:16:52.0024|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THA" completed keep alive response. 
+2017-04-25 14:16:52.0280|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 352.4073ms 200 application/json; charset=utf-8 
+2017-04-25 14:17:19.8647|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:18888/api/PickUp/PickProducts?shopid=10619&pickTime=2017%2F4%2F25+14%3A17%3A19&lastPickTime=2017-04-24+12%3A31%3A33.42   
+2017-04-25 14:17:19.9078|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path /api/PickUp/PickProducts does not match a supported file type 
+2017-04-25 14:17:19.9299|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/PickUp/PickProducts'. 
+2017-04-25 14:17:19.9479|2|Microsoft.AspNetCore.Mvc.Internal.ActionSelector|DEBUG|Action 'MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp)' with id '9fcaf410-3b24-4358-bcca-69eff3404abf' did not match the constraint 'Microsoft.AspNetCore.Mvc.Internal.HttpMethodActionConstraint' 
+2017-04-25 14:17:19.9665|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp) 
+2017-04-25 14:17:19.9830|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp) with arguments (10619, 2017/4/24 12:31:33, 2017/4/25 14:17:19) - ModelState is Valid 
+2017-04-25 14:17:20.0041|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:17:20.0226|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (2ms) [Parameters=[@__shopId_0='?'], CommandType='Text', CommandTimeout='30']
+SELECT [p].[ProductId], [p].[productName]
+FROM [ProductLibrary] AS [p]
+WHERE [p].[spID] = @__shopId_0 
+2017-04-25 14:17:20.0407|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:17:20.0577|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-25 14:17:20.0768|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-25 14:17:20.0948|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-25 14:17:20.1124|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-25 14:17:20.1294|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp) in 146.7331ms 
+2017-04-25 14:17:20.1490|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THA" completed keep alive response. 
+2017-04-25 14:17:20.1760|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 311.4225ms 200 application/json; charset=utf-8 
+2017-04-25 14:17:42.7943|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 OPTIONS http://localhost:18888/api/PickUp/PickProducts   
+2017-04-25 14:17:42.8249|1|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|OPTIONS requests are not supported 
+2017-04-25 14:17:42.8419|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/PickUp/PickProducts'. 
+2017-04-25 14:17:42.8600|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp) 
+2017-04-25 14:17:42.8825|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Authorization failed for the request at filter 'Microsoft.AspNetCore.Mvc.Cors.CorsAuthorizationFilter'. 
+2017-04-25 14:17:42.9016|1|Microsoft.AspNetCore.Mvc.StatusCodeResult|INFO|Executing HttpStatusCodeResult, setting HTTP status code 200 
+2017-04-25 14:17:42.9186|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp) in 42.1486ms 
+2017-04-25 14:17:42.9407|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THA" completed keep alive response. 
+2017-04-25 14:17:42.9637|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 169.343ms 200  
+2017-04-25 14:17:42.9823|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 POST http://localhost:18888/api/PickUp/PickProducts application/json;charset=UTF-8 2107 
+2017-04-25 14:17:43.0023|1|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|POST requests are not supported 
+2017-04-25 14:17:43.0209|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/PickUp/PickProducts'. 
+2017-04-25 14:17:43.0414|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp) 
+2017-04-25 14:17:43.0690|1|Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BodyModelBinder|DEBUG|Selected input formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonInputFormatter' for content type 'application/json;charset=UTF-8'. 
+2017-04-25 14:17:43.1833|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp) with arguments (MC.NetCore.DomainModels.RequestDto.PickUpProductsRequestDto) - ModelState is Valid 
+2017-04-25 14:17:43.2059|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:17:43.2274|5|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Beginning transaction with isolation level 'Unspecified'. 
+2017-04-25 14:17:43.5816|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (202ms) [Parameters=[@p0='?' (Size = 50), @p1='?', @p2='?' (Size = 50), @p3='?' (Size = 50), @p4='?', @p5='?', @p6='?' (Size = 50), @p7='?' (Size = 50), @p8='?', @p9='?' (Size = 50), @p10='?', @p11='?' (Size = 100), @p12='?' (Size = 50), @p13='?', @p14='?' (Size = 50), @p15='?', @p16='?' (Size = 100), @p17='?' (Size = 50), @p18='?', @p19='?' (Size = 50), @p20='?', @p21='?' (Size = 100), @p22='?' (Size = 50), @p23='?', @p24='?' (Size = 50), @p25='?', @p26='?' (Size = 100), @p27='?' (Size = 50), @p28='?', @p29='?' (Size = 50), @p30='?', @p31='?' (Size = 100), @p32='?' (Size = 50), @p33='?', @p34='?' (Size = 50), @p35='?', @p36='?' (Size = 100), @p37='?' (Size = 50), @p38='?', @p39='?' (Size = 50), @p40='?', @p41='?' (Size = 100), @p42='?' (Size = 50), @p43='?', @p44='?' (Size = 50), @p45='?', @p46='?' (Size = 100), @p47='?' (Size = 50), @p48='?', @p49='?' (Size = 50), @p50='?', @p51='?' (Size = 100), @p52='?' (Size = 50), @p53='?', @p54='?' (Size = 50), @p55='?', @p56='?' (Size = 100), @p57='?' (Size = 50), @p58='?', @p59='?' (Size = 50), @p60='?', @p61='?' (Size = 100), @p62='?' (Size = 50), @p63='?', @p64='?' (Size = 50), @p65='?', @p66='?' (Size = 100), @p67='?' (Size = 50), @p68='?', @p69='?' (Size = 50), @p70='?', @p71='?' (Size = 100), @p72='?' (Size = 50), @p73='?', @p74='?' (Size = 50), @p75='?', @p76='?' (Size = 100), @p77='?' (Size = 50), @p78='?', @p79='?' (Size = 50), @p80='?', @p81='?' (Size = 100), @p82='?' (Size = 50), @p83='?', @p84='?' (Size = 50), @p85='?', @p86='?' (Size = 100), @p87='?' (Size = 50), @p88='?', @p89='?' (Size = 50), @p90='?', @p91='?' (Size = 100), @p92='?' (Size = 50), @p93='?', @p94='?' (Size = 50), @p95='?', @p96='?' (Size = 100), @p97='?' (Size = 50), @p98='?', @p99='?' (Size = 50), @p100='?', @p101='?' (Size = 100), @p102='?' (Size = 50), @p103='?', @p104='?' (Size = 50), @p105='?', @p106='?' (Size = 100), @p107='?' (Size = 50), @p108='?', @p109='?' (Size = 50), @p110='?', @p111='?' (Size = 100), @p112='?' (Size = 50), @p113='?', @p114='?' (Size = 50), @p115='?', @p116='?' (Size = 100), @p117='?' (Size = 50), @p118='?', @p119='?' (Size = 50), @p120='?', @p121='?' (Size = 100), @p122='?' (Size = 50), @p123='?', @p124='?' (Size = 50), @p125='?', @p126='?' (Size = 100), @p127='?' (Size = 50), @p128='?', @p129='?' (Size = 50), @p130='?', @p131='?' (Size = 100), @p132='?' (Size = 50), @p133='?', @p134='?' (Size = 50), @p135='?', @p136='?' (Size = 100), @p137='?' (Size = 50), @p138='?', @p139='?' (Size = 50), @p140='?', @p141='?' (Size = 100), @p142='?' (Size = 50), @p143='?', @p144='?' (Size = 50), @p145='?', @p146='?' (Size = 100), @p147='?' (Size = 50), @p148='?', @p149='?' (Size = 50), @p150='?', @p151='?' (Size = 100), @p152='?' (Size = 50), @p153='?', @p154='?' (Size = 50), @p155='?', @p156='?' (Size = 100), @p157='?' (Size = 50), @p158='?', @p159='?' (Size = 50), @p160='?', @p161='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SET NOCOUNT ON;
+INSERT INTO [GoodsPickingBatch] ([ID], [DeliveryStatus], [PickMan], [PickManId], [PickTime], [ShopID], [ShopName])
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6);
+INSERT INTO [GoodsPickingDetail] ([ID], [PickAmount], [PickBatchID], [ProductID], [ProductName])
+VALUES (@p7, @p8, @p9, @p10, @p11),
+(@p12, @p13, @p14, @p15, @p16),
+(@p17, @p18, @p19, @p20, @p21),
+(@p22, @p23, @p24, @p25, @p26),
+(@p27, @p28, @p29, @p30, @p31),
+(@p32, @p33, @p34, @p35, @p36),
+(@p37, @p38, @p39, @p40, @p41),
+(@p42, @p43, @p44, @p45, @p46),
+(@p47, @p48, @p49, @p50, @p51),
+(@p52, @p53, @p54, @p55, @p56),
+(@p57, @p58, @p59, @p60, @p61),
+(@p62, @p63, @p64, @p65, @p66),
+(@p67, @p68, @p69, @p70, @p71),
+(@p72, @p73, @p74, @p75, @p76),
+(@p77, @p78, @p79, @p80, @p81),
+(@p82, @p83, @p84, @p85, @p86),
+(@p87, @p88, @p89, @p90, @p91),
+(@p92, @p93, @p94, @p95, @p96),
+(@p97, @p98, @p99, @p100, @p101),
+(@p102, @p103, @p104, @p105, @p106),
+(@p107, @p108, @p109, @p110, @p111),
+(@p112, @p113, @p114, @p115, @p116),
+(@p117, @p118, @p119, @p120, @p121),
+(@p122, @p123, @p124, @p125, @p126),
+(@p127, @p128, @p129, @p130, @p131),
+(@p132, @p133, @p134, @p135, @p136),
+(@p137, @p138, @p139, @p140, @p141),
+(@p142, @p143, @p144, @p145, @p146),
+(@p147, @p148, @p149, @p150, @p151),
+(@p152, @p153, @p154, @p155, @p156),
+(@p157, @p158, @p159, @p160, @p161); 
+2017-04-25 14:17:43.6017|6|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Committing transaction. 
+2017-04-25 14:17:43.6171|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:17:43.6291|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-25 14:17:43.6291|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-25 14:17:43.6552|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-25 14:17:43.6677|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-25 14:17:43.6818|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp) in 622.5366ms 
+2017-04-25 14:17:43.6968|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THA" completed keep alive response. 
+2017-04-25 14:17:43.7204|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 737.6487ms 200 application/json; charset=utf-8 
+2017-04-25 14:18:00.3902|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:18888/api/PickUp/Index   
+2017-04-25 14:18:00.4128|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path /api/PickUp/Index does not match a supported file type 
+2017-04-25 14:18:00.4269|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/PickUp/Index'. 
+2017-04-25 14:18:00.4424|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) 
+2017-04-25 14:18:00.4565|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) with arguments ((null)) - ModelState is Valid 
+2017-04-25 14:18:00.4565|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:18:00.4876|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+FROM [GoodsPickingBatch] AS [g] 
+2017-04-25 14:18:00.4876|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:18:00.5172|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:18:00.5493|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (15ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT * FROM
+                                (SELECT  ROW_NUMBER() OVER (PARTITION BY s.shopID ORDER BY b.PickTime DESC) AS Id
+                                ,s.shopID,s.shopName,b.PickTime,b.PickManId,b.PickMan
+                                ,(SELECT SUM(p.Price * d.PickAmount) 
+                                FROM dbo.ProductLibrary AS p
+                                INNER JOIN dbo.GoodsPickingDetail AS d
+                                ON p.ProductId=d.ProductID
+                                WHERE d.PickBatchID = b.ID)
+                                AS TotalAmount
+                                FROM dbo.Shop AS s
+                                LEFT OUTER JOIN dbo.GoodsPickingBatch AS b 
+                                ON b.ShopID = s.shopID
+                                WHERE s.courseTypeIds='2561'
+                                ) AS tmp 
+                                WHERE tmp.Id=1 
+2017-04-25 14:18:00.5693|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:18:00.5879|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-25 14:18:00.6074|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-25 14:18:00.6270|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-25 14:18:00.6470|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-25 14:18:00.6661|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) in 209.5657ms 
+2017-04-25 14:18:00.6871|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THA" completed keep alive response. 
+2017-04-25 14:18:00.7112|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 320.9568ms 200 application/json; charset=utf-8 
+2017-04-25 14:19:52.5110|6|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THA" received FIN. 
+2017-04-25 14:19:52.5544|10|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THA" disconnecting. 
+2017-04-25 14:19:52.5739|7|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THA" sending FIN. 
+2017-04-25 14:19:52.5950|8|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THA" sent FIN with status "0". 
+2017-04-25 14:19:52.6156|2|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THA" stopped. 
+2017-04-25 14:22:36.9436|1|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THB" started. 
+2017-04-25 14:22:36.9642|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:18888/api/PickUp/Index   
+2017-04-25 14:22:36.9852|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path /api/PickUp/Index does not match a supported file type 
+2017-04-25 14:22:37.0173|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/PickUp/Index'. 
+2017-04-25 14:22:37.0364|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) 
+2017-04-25 14:22:37.0534|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) with arguments ((null)) - ModelState is Valid 
+2017-04-25 14:22:37.0704|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:22:37.0905|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+FROM [GoodsPickingBatch] AS [g] 
+2017-04-25 14:22:37.1060|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:22:37.1211|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:22:37.1483|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (11ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT * FROM
+                                (SELECT  ROW_NUMBER() OVER (PARTITION BY s.shopID ORDER BY b.PickTime DESC) AS Id
+                                ,s.shopID,s.shopName,b.PickTime,b.PickManId,b.PickMan
+                                ,(SELECT SUM(p.Price * d.PickAmount) 
+                                FROM dbo.ProductLibrary AS p
+                                INNER JOIN dbo.GoodsPickingDetail AS d
+                                ON p.ProductId=d.ProductID
+                                WHERE d.PickBatchID = b.ID)
+                                AS TotalAmount
+                                FROM dbo.Shop AS s
+                                LEFT OUTER JOIN dbo.GoodsPickingBatch AS b 
+                                ON b.ShopID = s.shopID
+                                WHERE s.courseTypeIds='2561'
+                                ) AS tmp 
+                                WHERE tmp.Id=1 
+2017-04-25 14:22:37.1663|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:22:37.1829|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-25 14:22:37.2019|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-25 14:22:37.2215|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-25 14:22:37.2486|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-25 14:22:37.2786|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) in 225.7453ms 
+2017-04-25 14:22:37.3107|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THB" completed keep alive response. 
+2017-04-25 14:22:37.3493|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 385.3673ms 200 application/json; charset=utf-8 
+2017-04-25 14:22:59.8649|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:18888/api/PickUp/PickProducts?shopid=10619&pickTime=2017%2F4%2F25+14%3A22%3A59&lastPickTime=2017-04-25+14%3A17%3A19   
+2017-04-25 14:22:59.9000|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path /api/PickUp/PickProducts does not match a supported file type 
+2017-04-25 14:22:59.9216|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/PickUp/PickProducts'. 
+2017-04-25 14:22:59.9416|2|Microsoft.AspNetCore.Mvc.Internal.ActionSelector|DEBUG|Action 'MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp)' with id '9fcaf410-3b24-4358-bcca-69eff3404abf' did not match the constraint 'Microsoft.AspNetCore.Mvc.Internal.HttpMethodActionConstraint' 
+2017-04-25 14:22:59.9612|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp) 
+2017-04-25 14:22:59.9803|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp) with arguments (10619, 2017/4/25 14:17:19, 2017/4/25 14:22:59) - ModelState is Valid 
+2017-04-25 14:23:00.0000|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:23:00.0224|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (2ms) [Parameters=[@__shopId_0='?'], CommandType='Text', CommandTimeout='30']
+SELECT [p].[ProductId], [p].[productName]
+FROM [ProductLibrary] AS [p]
+WHERE [p].[spID] = @__shopId_0 
+2017-04-25 14:23:00.0425|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:23:00.0626|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-25 14:23:00.0831|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-25 14:23:00.1032|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-25 14:23:00.1237|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-25 14:23:00.1438|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.PickUpController.PickProducts (MC.NetCore.ShopApp) in 163.5839ms 
+2017-04-25 14:23:00.1658|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THB" completed keep alive response. 
+2017-04-25 14:23:00.1909|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 325.9053ms 200 application/json; charset=utf-8 
+2017-04-25 14:23:05.7082|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:18888/api/PickUp/Index   
+2017-04-25 14:23:05.7377|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path /api/PickUp/Index does not match a supported file type 
+2017-04-25 14:23:05.7603|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/PickUp/Index'. 
+2017-04-25 14:23:05.7797|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) 
+2017-04-25 14:23:05.7987|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) with arguments ((null)) - ModelState is Valid 
+2017-04-25 14:23:05.8188|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:23:05.8404|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+FROM [GoodsPickingBatch] AS [g] 
+2017-04-25 14:23:05.8609|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:23:05.8835|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:23:05.9181|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (12ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT * FROM
+                                (SELECT  ROW_NUMBER() OVER (PARTITION BY s.shopID ORDER BY b.PickTime DESC) AS Id
+                                ,s.shopID,s.shopName,b.PickTime,b.PickManId,b.PickMan
+                                ,(SELECT SUM(p.Price * d.PickAmount) 
+                                FROM dbo.ProductLibrary AS p
+                                INNER JOIN dbo.GoodsPickingDetail AS d
+                                ON p.ProductId=d.ProductID
+                                WHERE d.PickBatchID = b.ID)
+                                AS TotalAmount
+                                FROM dbo.Shop AS s
+                                LEFT OUTER JOIN dbo.GoodsPickingBatch AS b 
+                                ON b.ShopID = s.shopID
+                                WHERE s.courseTypeIds='2561'
+                                ) AS tmp 
+                                WHERE tmp.Id=1 
+2017-04-25 14:23:05.9406|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 14:23:05.9622|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-25 14:23:05.9842|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-25 14:23:06.0063|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-25 14:23:06.0268|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-25 14:23:06.0464|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) in 247.7976ms 
+2017-04-25 14:23:06.0685|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THB" completed keep alive response. 
+2017-04-25 14:23:06.0960|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 387.9307ms 200 application/json; charset=utf-8 
+2017-04-25 14:25:06.7165|10|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THB" disconnecting. 
+2017-04-25 14:25:06.7536|7|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THB" sending FIN. 
+2017-04-25 14:25:06.7761|8|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THB" sent FIN with status "0". 
+2017-04-25 14:25:06.7968|2|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BK6643THB" stopped. 
+2017-04-25 14:43:52.4772|5|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting shutdown 
+2017-04-25 17:04:02.7436|59|Microsoft.Extensions.DependencyInjection.DataProtectionServices|WARN|Neither user profile nor HKLM registry available. Using an ephemeral key repository. Protected data will be unavailable when application exits. 
+2017-04-25 17:04:02.7927|50|Microsoft.AspNetCore.DataProtection.Repositories.EphemeralXmlRepository|WARN|Using an in-memory repository. Keys will not be persisted to storage. 
+2017-04-25 17:04:02.8639|3|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting starting 
+2017-04-25 17:04:02.9627|4|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting started 
+2017-04-25 17:04:02.9952|1|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BN82FO3CR" started. 
+2017-04-25 17:04:03.1005|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:18888/api/PickUp/Index   
+2017-04-25 17:04:03.1807|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path /api/PickUp/Index does not match a supported file type 
+2017-04-25 17:04:03.3981|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/PickUp/Index'. 
+2017-04-25 17:04:03.4858|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) 
+2017-04-25 17:04:03.6515|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) with arguments ((null)) - ModelState is Valid 
+2017-04-25 17:04:04.2280|2|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Compiling query model: 
+'(from GoodsPickingBatch <generated>_1 in DbSet<GoodsPickingBatch>
+select <generated>_1)
+.FirstOrDefault()' 
+2017-04-25 17:04:04.2556|3|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Optimized query model: 
+'(from GoodsPickingBatch <generated>_1 in DbSet<GoodsPickingBatch>
+select <generated>_1)
+.FirstOrDefault()' 
+2017-04-25 17:04:04.4531|5|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|TRACKED: True
+(QueryContext queryContext) => IEnumerable<GoodsPickingBatch> _ToSequence(
+    element: GoodsPickingBatch FirstOrDefault(
+        source: IEnumerable<GoodsPickingBatch> _ShapedQuery(
+            queryContext: queryContext, 
+            shaperCommandContext: SelectExpression: 
+                SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+                FROM [GoodsPickingBatch] AS [g]
+            , 
+            shaper: UnbufferedEntityShaper<GoodsPickingBatch>
+        )
+    )
+)
+ 
+2017-04-25 17:04:04.5067|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 17:04:04.6972|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (33ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+FROM [GoodsPickingBatch] AS [g] 
+2017-04-25 17:04:04.7333|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 17:04:04.8025|2|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Compiling query model: 
+'from Shop shop in 
+    (from Shop <generated>_1 in DbSet<Shop>
+    select <generated>_1)
+    .AsNoTracking()
+where shop.CourseTypeIds == "2561"
+select new ShopDto{ 
+    shop.ShopIdShopId = [shop].ShopId, 
+    shop.ShopNameShopName = [shop].ShopName 
+}
+' 
+2017-04-25 17:04:04.8326|3|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Optimized query model: 
+'from Shop shop in DbSet<Shop>
+where shop.CourseTypeIds == "2561"
+select new ShopDto{ 
+    shop.ShopIdShopId = [shop].ShopId, 
+    shop.ShopNameShopName = [shop].ShopName 
+}
+' 
+2017-04-25 17:04:04.9053|5|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|TRACKED: True
+(QueryContext queryContext) => IAsyncEnumerable<ShopDto> _Select(
+    source: IAsyncEnumerable<ValueBuffer> _ShapedQuery(
+        queryContext: queryContext, 
+        shaperCommandContext: SelectExpression: 
+            SELECT [shop].[shopID], [shop].[shopName]
+            FROM [Shop] AS [shop]
+            WHERE [shop].[courseTypeIds] = '2561'
+        , 
+        shaper: ValueBufferShaper
+    )
+    , 
+    selector: (ValueBuffer shop) => new ShopDto{ 
+        int TryReadValue(
+            valueBuffer: shop, 
+            index: 0, 
+            property: null
+        )
+        ShopId = TryReadValue(shop, 0, null), 
+        string TryReadValue(
+            valueBuffer: shop, 
+            index: 1, 
+            property: null
+        )
+        ShopName = TryReadValue(shop, 1, null) 
+    }
+)
+ 
+2017-04-25 17:04:04.9309|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 17:04:04.9700|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (21ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [shop].[shopID], [shop].[shopName]
+FROM [Shop] AS [shop]
+WHERE [shop].[courseTypeIds] = '2561' 
+2017-04-25 17:04:05.0016|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 17:04:05.0096|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-25 17:04:05.0457|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-25 17:04:05.0592|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-25 17:04:05.0722|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-25 17:04:05.2979|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) in 1792.9545ms 
+2017-04-25 17:04:05.3154|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BN82FO3CR" completed keep alive response. 
+2017-04-25 17:04:05.3269|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 2243.0445ms 200 application/json; charset=utf-8 
+2017-04-25 17:04:35.4962|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 GET http://localhost:18888/api/PickUp/Index   
+2017-04-25 17:04:35.4962|4|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|The request path /api/PickUp/Index does not match a supported file type 
+2017-04-25 17:04:35.5167|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/PickUp/Index'. 
+2017-04-25 17:04:35.5288|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) 
+2017-04-25 17:04:35.5538|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) with arguments ((null)) - ModelState is Valid 
+2017-04-25 17:04:35.5814|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 17:04:35.6295|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (18ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [g].[ID], [g].[DeliveryStatus], [g].[PickMan], [g].[PickManId], [g].[PickTime], [g].[ShopID], [g].[ShopName]
+FROM [GoodsPickingBatch] AS [g] 
+2017-04-25 17:04:35.6451|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 17:04:35.6701|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 17:04:35.6817|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [shop].[shopID], [shop].[shopName]
+FROM [Shop] AS [shop]
+WHERE [shop].[courseTypeIds] = '2561' 
+2017-04-25 17:04:35.7037|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 17:04:35.7218|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executed action method MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp), returned result Microsoft.AspNetCore.Mvc.ObjectResult. 
+2017-04-25 17:04:35.7408|4|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|No information found on request to perform content negotiation. 
+2017-04-25 17:04:35.7594|2|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|DEBUG|Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonOutputFormatter' and content type 'application/json' to write the response. 
+2017-04-25 17:04:35.7774|1|Microsoft.AspNetCore.Mvc.Internal.ObjectResultExecutor|INFO|Executing ObjectResult, writing value Microsoft.AspNetCore.Mvc.ControllerContext. 
+2017-04-25 17:04:35.7960|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.PickUpController.Index (MC.NetCore.ShopApp) in 252.5891ms 
+2017-04-25 17:04:35.8160|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BN82FO3CR" completed keep alive response. 
+2017-04-25 17:04:35.8381|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 341.8093ms 200 application/json; charset=utf-8 
+2017-04-25 17:05:52.9792|6|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BN82FO3CR" received FIN. 
+2017-04-25 17:05:53.0087|10|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BN82FO3CR" disconnecting. 
+2017-04-25 17:05:53.0358|7|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BN82FO3CR" sending FIN. 
+2017-04-25 17:05:53.0659|8|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BN82FO3CR" sent FIN with status "0". 
+2017-04-25 17:05:53.0880|2|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BN82FO3CR" stopped. 
+2017-04-25 17:25:01.9538|5|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting shutdown 
+2017-04-25 17:29:04.7322|59|Microsoft.Extensions.DependencyInjection.DataProtectionServices|WARN|Neither user profile nor HKLM registry available. Using an ephemeral key repository. Protected data will be unavailable when application exits. 
+2017-04-25 17:29:04.7798|50|Microsoft.AspNetCore.DataProtection.Repositories.EphemeralXmlRepository|WARN|Using an in-memory repository. Keys will not be persisted to storage. 
+2017-04-25 17:29:04.8475|3|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting starting 
+2017-04-25 17:29:04.9437|4|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting started 
+2017-04-25 17:29:04.9958|1|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNM23U4EJ" started. 
+2017-04-25 17:29:05.1021|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 POST http://localhost:18888/api/user/loginon application/json 59 
+2017-04-25 17:29:05.1798|1|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|POST requests are not supported 
+2017-04-25 17:29:05.4839|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/User/LoginOn'. 
+2017-04-25 17:29:05.5731|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.UserController.LoginOn (MC.NetCore.ShopApp) 
+2017-04-25 17:29:05.8343|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.UserController.LoginOn (MC.NetCore.ShopApp) with arguments (MC.NetCore.DomainModels.RequestDto.LoginOnRequestDto) - ModelState is Valid 
+2017-04-25 17:29:06.5874|2|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Compiling query model: 
+'(from ShopUserInfo a in 
+    (from ShopUserInfo <generated>_2 in DbSet<ShopUserInfo>
+    select <generated>_2)
+    .AsNoTracking()
+join UserBelongToShop b in 
+    (from UserBelongToShop <generated>_1 in DbSet<UserBelongToShop>
+    select <generated>_1)
+    .AsNoTracking()
+on <generated>_2.UserId equals b.UserId into tmp
+where a.UserName == __request_UserName_0 && a.Password == __request_Password_1 && a.RoleId == __request_Role_2
+from UserBelongToShop s in 
+    (from UserBelongToShop <generated>_1 in tmp
+    select <generated>_1)
+    .DefaultIfEmpty()
+select new UserDto{ 
+    a.UserIdUserId = [a].UserId, 
+    a.UserNameUserName = [a].UserName, 
+    a.RoleIdRoleId = [a].RoleId, 
+    a.RoleNameRoleName = [a].RoleName, 
+    (Nullable<int>) s.ShopId ?? (int) s.ShopIdShopId = Convert(([s].ShopId ?? Convert([s].ShopId))) 
+}
+)
+.FirstOrDefault()' 
+2017-04-25 17:29:06.6385|3|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Optimized query model: 
+'(from ShopUserInfo a in DbSet<ShopUserInfo>
+join UserBelongToShop b in DbSet<UserBelongToShop>
+on a.UserId equals b.UserId into tmp
+where a.UserName == __request_UserName_0 && a.Password == __request_Password_1 && a.RoleId == __request_Role_2
+from UserBelongToShop s in 
+    (from UserBelongToShop <generated>_1 in tmp
+    select <generated>_1)
+    .DefaultIfEmpty()
+select new UserDto{ 
+    a.UserIdUserId = [a].UserId, 
+    a.UserNameUserName = [a].UserName, 
+    a.RoleIdRoleId = [a].RoleId, 
+    a.RoleNameRoleName = [a].RoleName, 
+    (Nullable<int>) s.ShopId ?? (int) s.ShopIdShopId = Convert(([s].ShopId ?? Convert([s].ShopId))) 
+}
+)
+.FirstOrDefault()' 
+2017-04-25 17:29:06.7814|8|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|WARN|The LINQ expression 'DefaultIfEmpty()' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider. 
+2017-04-25 17:29:06.7990|8|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|WARN|The LINQ expression 'DefaultIfEmpty()' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider. 
+2017-04-25 17:29:06.8185|8|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|WARN|The LINQ expression 'from UserBelongToShop s in {[tmp] => DefaultIfEmpty()}' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider. 
+2017-04-25 17:29:06.8486|8|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|WARN|The LINQ expression 'FirstOrDefault()' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider. 
+2017-04-25 17:29:06.9213|5|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|TRACKED: False
+(QueryContext queryContext) => IAsyncEnumerable<UserDto> _ToSequence(
+    task: Task<UserDto> _FirstOrDefault(
+        source: IAsyncEnumerable<UserDto> _Select(
+            source: IAsyncEnumerable<TransparentIdentifier<TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>>, UserBelongToShop>> _SelectMany(
+                source: IAsyncEnumerable<TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>>> _GroupJoin(
+                    queryContext: (RelationalQueryContext) queryContext, 
+                    source: IAsyncEnumerable<ValueBuffer> _Query(
+                        queryContext: queryContext, 
+                        shaperCommandContext: SelectExpression: 
+                            SELECT [a].[UserId], [a].[CreateTime], [a].[IsDelete], [a].[ModifyTime], [a].[Password], [a].[RealName], [a].[RoleId], [a].[RoleName], [a].[UserName], [b].[Id], [b].[ShopId], [b].[UserId]
+                            FROM [ShopUserInfo] AS [a]
+                            LEFT JOIN [UserBelongToShop] AS [b] ON [a].[UserId] = [b].[UserId]
+                            WHERE (([a].[UserName] = @__request_UserName_0) AND ([a].[Password] = @__request_Password_1)) AND ([a].[RoleId] = @__request_Role_2)
+                            ORDER BY [a].[UserId]
+                        , 
+                        queryIndex: default(System.Nullable`1[System.Int32])
+                    )
+                    , 
+                    outerShaper: BufferedEntityShaper<ShopUserInfo>, 
+                    innerShaper: BufferedOffsetEntityShaper<UserBelongToShop>, 
+                    innerKeySelector: (UserBelongToShop b) => b.UserId, 
+                    resultSelector: (ShopUserInfo a | IAsyncEnumerable<UserBelongToShop> tmp) => TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>> CreateTransparentIdentifier(
+                        outer: a, 
+                        inner: tmp
+                    )
+                    , 
+                    outerGroupJoinInclude: default(Internal.AsyncGroupJoinInclude), 
+                    innerGroupJoinInclude: default(Internal.AsyncGroupJoinInclude)
+                )
+                , 
+                collectionSelector: (TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>> t0) => IAsyncEnumerable<UserBelongToShop> DefaultIfEmpty(
+                    source: t0.Inner
+                )
+                , 
+                resultSelector: (TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>> t0 | UserBelongToShop s) => TransparentIdentifier<TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>>, UserBelongToShop> CreateTransparentIdentifier(
+                    outer: t0, 
+                    inner: s
+                )
+            )
+            , 
+            selector: (TransparentIdentifier<TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>>, UserBelongToShop> t1) => new UserDto{ 
+                t1.Outer.Outer.UserIdUserId = t1.Outer.Outer.UserId, 
+                t1.Outer.Outer.UserNameUserName = t1.Outer.Outer.UserName, 
+                t1.Outer.Outer.RoleIdRoleId = t1.Outer.Outer.RoleId, 
+                t1.Outer.Outer.RoleNameRoleName = t1.Outer.Outer.RoleName, 
+                (Nullable<int>) t1.Inner.ShopId ?? (int) t1.Inner.ShopIdShopId = Convert((t1.Inner.ShopId ?? Convert(t1.Inner.ShopId))) 
+            }
+        )
+        , 
+        cancellationToken: queryContext.CancellationToken
+    )
+)
+ 
+2017-04-25 17:29:07.0035|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 17:29:07.2877|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (84ms) [Parameters=[@__request_Role_2='?'], CommandType='Text', CommandTimeout='30']
+SELECT [a].[UserId], [a].[CreateTime], [a].[IsDelete], [a].[ModifyTime], [a].[Password], [a].[RealName], [a].[RoleId], [a].[RoleName], [a].[UserName], [b].[Id], [b].[ShopId], [b].[UserId]
+FROM [ShopUserInfo] AS [a]
+LEFT JOIN [UserBelongToShop] AS [b] ON [a].[UserId] = [b].[UserId]
+WHERE ([a].[UserName] IS NULL AND [a].[Password] IS NULL) AND ([a].[RoleId] = @__request_Role_2)
+ORDER BY [a].[UserId] 
+2017-04-25 17:29:07.4659|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 17:29:07.5357|1|Microsoft.AspNetCore.Mvc.Formatters.Json.Internal.JsonResultExecutor|INFO|Executing JsonResult, writing value MC.NetCore.ShopApp.ResponseBaseDto.BaseResult. 
+2017-04-25 17:29:07.7388|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.UserController.LoginOn (MC.NetCore.ShopApp) in 2146.6563ms 
+2017-04-25 17:29:07.7738|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNM23U4EJ" completed keep alive response. 
+2017-04-25 17:29:07.8024|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 2715.4424ms 500 application/json; charset=utf-8 
+2017-04-25 17:30:55.0242|6|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNM23U4EJ" received FIN. 
+2017-04-25 17:30:55.0889|10|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNM23U4EJ" disconnecting. 
+2017-04-25 17:30:55.1180|7|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNM23U4EJ" sending FIN. 
+2017-04-25 17:30:55.2212|8|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNM23U4EJ" sent FIN with status "0". 
+2017-04-25 17:30:55.2754|2|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNM23U4EJ" stopped. 
+2017-04-25 17:31:04.5408|1|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNM23U4EK" started. 
+2017-04-25 17:31:04.5759|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 POST http://localhost:18888/api/user/loginon application/json 59 
+2017-04-25 17:31:04.6064|1|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|POST requests are not supported 
+2017-04-25 17:31:04.6380|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/User/LoginOn'. 
+2017-04-25 17:31:04.6651|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.UserController.LoginOn (MC.NetCore.ShopApp) 
+2017-04-25 17:31:05.0065|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.UserController.LoginOn (MC.NetCore.ShopApp) with arguments (MC.NetCore.DomainModels.RequestDto.LoginOnRequestDto) - ModelState is Valid 
+2017-04-25 17:31:18.5347|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 17:31:18.5934|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (14ms) [Parameters=[@__request_Role_2='?'], CommandType='Text', CommandTimeout='30']
+SELECT [a].[UserId], [a].[CreateTime], [a].[IsDelete], [a].[ModifyTime], [a].[Password], [a].[RealName], [a].[RoleId], [a].[RoleName], [a].[UserName], [b].[Id], [b].[ShopId], [b].[UserId]
+FROM [ShopUserInfo] AS [a]
+LEFT JOIN [UserBelongToShop] AS [b] ON [a].[UserId] = [b].[UserId]
+WHERE ([a].[UserName] IS NULL AND [a].[Password] IS NULL) AND ([a].[RoleId] = @__request_Role_2)
+ORDER BY [a].[UserId] 
+2017-04-25 17:31:18.6290|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 17:31:18.6666|1|Microsoft.AspNetCore.Mvc.Formatters.Json.Internal.JsonResultExecutor|INFO|Executing JsonResult, writing value MC.NetCore.ShopApp.ResponseBaseDto.BaseResult. 
+2017-04-25 17:31:18.7197|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.UserController.LoginOn (MC.NetCore.ShopApp) in 14034.1789ms 
+2017-04-25 17:31:18.7658|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNM23U4EK" completed keep alive response. 
+2017-04-25 17:31:18.8105|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 14240.0967ms 500 application/json; charset=utf-8 
+2017-04-25 17:31:40.0328|5|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting shutdown 
+2017-04-25 17:31:40.1000|10|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNM23U4EK" disconnecting. 
+2017-04-25 17:31:40.1346|7|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNM23U4EK" sending FIN. 
+2017-04-25 17:31:40.1632|8|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNM23U4EK" sent FIN with status "0". 
+2017-04-25 17:31:40.1852|2|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNM23U4EK" stopped. 
+2017-04-25 17:32:24.0617|59|Microsoft.Extensions.DependencyInjection.DataProtectionServices|WARN|Neither user profile nor HKLM registry available. Using an ephemeral key repository. Protected data will be unavailable when application exits. 
+2017-04-25 17:32:24.1259|50|Microsoft.AspNetCore.DataProtection.Repositories.EphemeralXmlRepository|WARN|Using an in-memory repository. Keys will not be persisted to storage. 
+2017-04-25 17:32:24.1961|3|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting starting 
+2017-04-25 17:32:24.2918|4|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting started 
+2017-04-25 17:32:24.5152|1|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNNTIMA6O" started. 
+2017-04-25 17:32:24.6335|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 POST http://localhost:18888/api/user/loginon application/json 59 
+2017-04-25 17:32:24.7679|1|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|POST requests are not supported 
+2017-04-25 17:32:24.9815|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/User/LoginOn'. 
+2017-04-25 17:32:25.0732|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.UserController.LoginOn (MC.NetCore.ShopApp) 
+2017-04-25 17:32:25.4507|1|Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BodyModelBinder|DEBUG|Selected input formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonInputFormatter' for content type 'application/json'. 
+2017-04-25 17:32:25.6968|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.UserController.LoginOn (MC.NetCore.ShopApp) with arguments (MC.NetCore.DomainModels.RequestDto.LoginOnRequestDto) - ModelState is Valid 
+2017-04-25 17:32:26.3982|2|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Compiling query model: 
+'(from ShopUserInfo a in 
+    (from ShopUserInfo <generated>_2 in DbSet<ShopUserInfo>
+    select <generated>_2)
+    .AsNoTracking()
+join UserBelongToShop b in 
+    (from UserBelongToShop <generated>_1 in DbSet<UserBelongToShop>
+    select <generated>_1)
+    .AsNoTracking()
+on <generated>_2.UserId equals b.UserId into tmp
+where a.UserName == __request_UserName_0 && a.Password == __request_Password_1 && a.RoleId == __request_Role_2
+from UserBelongToShop s in 
+    (from UserBelongToShop <generated>_1 in tmp
+    select <generated>_1)
+    .DefaultIfEmpty()
+select new UserDto{ 
+    a.UserIdUserId = [a].UserId, 
+    a.UserNameUserName = [a].UserName, 
+    a.RoleIdRoleId = [a].RoleId, 
+    a.RoleNameRoleName = [a].RoleName, 
+    (Nullable<int>) s.ShopId ?? (int) s.ShopIdShopId = Convert(([s].ShopId ?? Convert([s].ShopId))) 
+}
+)
+.FirstOrDefault()' 
+2017-04-25 17:32:26.4639|3|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Optimized query model: 
+'(from ShopUserInfo a in DbSet<ShopUserInfo>
+join UserBelongToShop b in DbSet<UserBelongToShop>
+on a.UserId equals b.UserId into tmp
+where a.UserName == __request_UserName_0 && a.Password == __request_Password_1 && a.RoleId == __request_Role_2
+from UserBelongToShop s in 
+    (from UserBelongToShop <generated>_1 in tmp
+    select <generated>_1)
+    .DefaultIfEmpty()
+select new UserDto{ 
+    a.UserIdUserId = [a].UserId, 
+    a.UserNameUserName = [a].UserName, 
+    a.RoleIdRoleId = [a].RoleId, 
+    a.RoleNameRoleName = [a].RoleName, 
+    (Nullable<int>) s.ShopId ?? (int) s.ShopIdShopId = Convert(([s].ShopId ?? Convert([s].ShopId))) 
+}
+)
+.FirstOrDefault()' 
+2017-04-25 17:32:26.6017|8|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|WARN|The LINQ expression 'DefaultIfEmpty()' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider. 
+2017-04-25 17:32:26.6213|8|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|WARN|The LINQ expression 'DefaultIfEmpty()' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider. 
+2017-04-25 17:32:26.6413|8|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|WARN|The LINQ expression 'from UserBelongToShop s in {[tmp] => DefaultIfEmpty()}' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider. 
+2017-04-25 17:32:26.6724|8|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|WARN|The LINQ expression 'FirstOrDefault()' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider. 
+2017-04-25 17:32:26.7488|5|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|TRACKED: False
+(QueryContext queryContext) => IAsyncEnumerable<UserDto> _ToSequence(
+    task: Task<UserDto> _FirstOrDefault(
+        source: IAsyncEnumerable<UserDto> _Select(
+            source: IAsyncEnumerable<TransparentIdentifier<TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>>, UserBelongToShop>> _SelectMany(
+                source: IAsyncEnumerable<TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>>> _GroupJoin(
+                    queryContext: (RelationalQueryContext) queryContext, 
+                    source: IAsyncEnumerable<ValueBuffer> _Query(
+                        queryContext: queryContext, 
+                        shaperCommandContext: SelectExpression: 
+                            SELECT [a].[UserId], [a].[CreateTime], [a].[IsDelete], [a].[ModifyTime], [a].[Password], [a].[RealName], [a].[RoleId], [a].[RoleName], [a].[UserName], [b].[Id], [b].[ShopId], [b].[UserId]
+                            FROM [ShopUserInfo] AS [a]
+                            LEFT JOIN [UserBelongToShop] AS [b] ON [a].[UserId] = [b].[UserId]
+                            WHERE (([a].[UserName] = @__request_UserName_0) AND ([a].[Password] = @__request_Password_1)) AND ([a].[RoleId] = @__request_Role_2)
+                            ORDER BY [a].[UserId]
+                        , 
+                        queryIndex: default(System.Nullable`1[System.Int32])
+                    )
+                    , 
+                    outerShaper: BufferedEntityShaper<ShopUserInfo>, 
+                    innerShaper: BufferedOffsetEntityShaper<UserBelongToShop>, 
+                    innerKeySelector: (UserBelongToShop b) => b.UserId, 
+                    resultSelector: (ShopUserInfo a | IAsyncEnumerable<UserBelongToShop> tmp) => TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>> CreateTransparentIdentifier(
+                        outer: a, 
+                        inner: tmp
+                    )
+                    , 
+                    outerGroupJoinInclude: default(Internal.AsyncGroupJoinInclude), 
+                    innerGroupJoinInclude: default(Internal.AsyncGroupJoinInclude)
+                )
+                , 
+                collectionSelector: (TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>> t0) => IAsyncEnumerable<UserBelongToShop> DefaultIfEmpty(
+                    source: t0.Inner
+                )
+                , 
+                resultSelector: (TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>> t0 | UserBelongToShop s) => TransparentIdentifier<TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>>, UserBelongToShop> CreateTransparentIdentifier(
+                    outer: t0, 
+                    inner: s
+                )
+            )
+            , 
+            selector: (TransparentIdentifier<TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>>, UserBelongToShop> t1) => new UserDto{ 
+                t1.Outer.Outer.UserIdUserId = t1.Outer.Outer.UserId, 
+                t1.Outer.Outer.UserNameUserName = t1.Outer.Outer.UserName, 
+                t1.Outer.Outer.RoleIdRoleId = t1.Outer.Outer.RoleId, 
+                t1.Outer.Outer.RoleNameRoleName = t1.Outer.Outer.RoleName, 
+                (Nullable<int>) t1.Inner.ShopId ?? (int) t1.Inner.ShopIdShopId = Convert((t1.Inner.ShopId ?? Convert(t1.Inner.ShopId))) 
+            }
+        )
+        , 
+        cancellationToken: queryContext.CancellationToken
+    )
+)
+ 
+2017-04-25 17:32:26.9815|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 17:32:27.2894|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (86ms) [Parameters=[@__request_Role_2='?'], CommandType='Text', CommandTimeout='30']
+SELECT [a].[UserId], [a].[CreateTime], [a].[IsDelete], [a].[ModifyTime], [a].[Password], [a].[RealName], [a].[RoleId], [a].[RoleName], [a].[UserName], [b].[Id], [b].[ShopId], [b].[UserId]
+FROM [ShopUserInfo] AS [a]
+LEFT JOIN [UserBelongToShop] AS [b] ON [a].[UserId] = [b].[UserId]
+WHERE ([a].[UserName] IS NULL AND [a].[Password] IS NULL) AND ([a].[RoleId] = @__request_Role_2)
+ORDER BY [a].[UserId] 
+2017-04-25 17:32:27.3395|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 17:32:27.3947|1|Microsoft.AspNetCore.Mvc.Formatters.Json.Internal.JsonResultExecutor|INFO|Executing JsonResult, writing value MC.NetCore.ShopApp.ResponseBaseDto.BaseResult. 
+2017-04-25 17:32:27.5310|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.UserController.LoginOn (MC.NetCore.ShopApp) in 2434.5585ms 
+2017-04-25 17:32:27.5686|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNNTIMA6O" completed keep alive response. 
+2017-04-25 17:32:27.6032|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 2993.2445ms 500 application/json; charset=utf-8 
+2017-04-25 17:33:04.2894|5|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting shutdown 
+2017-04-25 17:33:04.3441|10|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNNTIMA6O" disconnecting. 
+2017-04-25 17:33:04.3746|7|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNNTIMA6O" sending FIN. 
+2017-04-25 17:33:04.4112|8|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNNTIMA6O" sent FIN with status "0". 
+2017-04-25 17:33:04.4453|2|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNNTIMA6O" stopped. 
+2017-04-25 17:33:36.8735|59|Microsoft.Extensions.DependencyInjection.DataProtectionServices|WARN|Neither user profile nor HKLM registry available. Using an ephemeral key repository. Protected data will be unavailable when application exits. 
+2017-04-25 17:33:36.9332|50|Microsoft.AspNetCore.DataProtection.Repositories.EphemeralXmlRepository|WARN|Using an in-memory repository. Keys will not be persisted to storage. 
+2017-04-25 17:33:37.0199|3|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting starting 
+2017-04-25 17:33:37.1227|4|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting started 
+2017-04-25 17:33:37.1458|1|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNOJ7BMUF" started. 
+2017-04-25 17:33:37.2606|1|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request starting HTTP/1.1 POST http://localhost:18888/api/user/loginon application/json 59 
+2017-04-25 17:33:37.3413|1|Microsoft.AspNetCore.StaticFiles.StaticFileMiddleware|DEBUG|POST requests are not supported 
+2017-04-25 17:33:37.5343|1|Microsoft.AspNetCore.Routing.Tree.TreeRouter|DEBUG|Request successfully matched the route with name '(null)' and template 'api/User/LoginOn'. 
+2017-04-25 17:33:37.6260|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|DEBUG|Executing action MC.NetCore.ShopApp.Controllers.UserController.LoginOn (MC.NetCore.ShopApp) 
+2017-04-25 17:33:37.8281|1|Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BodyModelBinder|DEBUG|Selected input formatter 'Microsoft.AspNetCore.Mvc.Formatters.JsonInputFormatter' for content type 'application/json'. 
+2017-04-25 17:33:38.0577|1|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executing action method MC.NetCore.ShopApp.Controllers.UserController.LoginOn (MC.NetCore.ShopApp) with arguments (MC.NetCore.DomainModels.RequestDto.LoginOnRequestDto) - ModelState is Valid 
+2017-04-25 17:33:38.7525|2|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Compiling query model: 
+'(from ShopUserInfo a in 
+    (from ShopUserInfo <generated>_2 in DbSet<ShopUserInfo>
+    select <generated>_2)
+    .AsNoTracking()
+join UserBelongToShop b in 
+    (from UserBelongToShop <generated>_1 in DbSet<UserBelongToShop>
+    select <generated>_1)
+    .AsNoTracking()
+on <generated>_2.UserId equals b.UserId into tmp
+where a.UserName == __request_UserName_0 && a.Password == __request_Password_1 && a.RoleId == __request_Role_2
+from UserBelongToShop s in 
+    (from UserBelongToShop <generated>_1 in tmp
+    select <generated>_1)
+    .DefaultIfEmpty()
+select new UserDto{ 
+    a.UserIdUserId = [a].UserId, 
+    a.UserNameUserName = [a].UserName, 
+    a.RoleIdRoleId = [a].RoleId, 
+    a.RoleNameRoleName = [a].RoleName, 
+    (Nullable<int>) s.ShopId ?? (int) s.ShopIdShopId = Convert(([s].ShopId ?? Convert([s].ShopId))) 
+}
+)
+.FirstOrDefault()' 
+2017-04-25 17:33:38.8082|3|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|Optimized query model: 
+'(from ShopUserInfo a in DbSet<ShopUserInfo>
+join UserBelongToShop b in DbSet<UserBelongToShop>
+on a.UserId equals b.UserId into tmp
+where a.UserName == __request_UserName_0 && a.Password == __request_Password_1 && a.RoleId == __request_Role_2
+from UserBelongToShop s in 
+    (from UserBelongToShop <generated>_1 in tmp
+    select <generated>_1)
+    .DefaultIfEmpty()
+select new UserDto{ 
+    a.UserIdUserId = [a].UserId, 
+    a.UserNameUserName = [a].UserName, 
+    a.RoleIdRoleId = [a].RoleId, 
+    a.RoleNameRoleName = [a].RoleName, 
+    (Nullable<int>) s.ShopId ?? (int) s.ShopIdShopId = Convert(([s].ShopId ?? Convert([s].ShopId))) 
+}
+)
+.FirstOrDefault()' 
+2017-04-25 17:33:38.9576|8|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|WARN|The LINQ expression 'DefaultIfEmpty()' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider. 
+2017-04-25 17:33:38.9776|8|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|WARN|The LINQ expression 'DefaultIfEmpty()' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider. 
+2017-04-25 17:33:38.9992|8|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|WARN|The LINQ expression 'from UserBelongToShop s in {[tmp] => DefaultIfEmpty()}' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider. 
+2017-04-25 17:33:39.0308|8|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|WARN|The LINQ expression 'FirstOrDefault()' could not be translated and will be evaluated locally. To configure this warning use the DbContextOptionsBuilder.ConfigureWarnings API (event id 'RelationalEventId.QueryClientEvaluationWarning'). ConfigureWarnings can be used when overriding the DbContext.OnConfiguring method or using AddDbContext on the application service provider. 
+2017-04-25 17:33:39.1065|5|Microsoft.EntityFrameworkCore.Query.Internal.SqlServerQueryCompilationContextFactory|DEBUG|TRACKED: False
+(QueryContext queryContext) => IAsyncEnumerable<UserDto> _ToSequence(
+    task: Task<UserDto> _FirstOrDefault(
+        source: IAsyncEnumerable<UserDto> _Select(
+            source: IAsyncEnumerable<TransparentIdentifier<TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>>, UserBelongToShop>> _SelectMany(
+                source: IAsyncEnumerable<TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>>> _GroupJoin(
+                    queryContext: (RelationalQueryContext) queryContext, 
+                    source: IAsyncEnumerable<ValueBuffer> _Query(
+                        queryContext: queryContext, 
+                        shaperCommandContext: SelectExpression: 
+                            SELECT [a].[UserId], [a].[CreateTime], [a].[IsDelete], [a].[ModifyTime], [a].[Password], [a].[RealName], [a].[RoleId], [a].[RoleName], [a].[UserName], [b].[Id], [b].[ShopId], [b].[UserId]
+                            FROM [ShopUserInfo] AS [a]
+                            LEFT JOIN [UserBelongToShop] AS [b] ON [a].[UserId] = [b].[UserId]
+                            WHERE (([a].[UserName] = @__request_UserName_0) AND ([a].[Password] = @__request_Password_1)) AND ([a].[RoleId] = @__request_Role_2)
+                            ORDER BY [a].[UserId]
+                        , 
+                        queryIndex: default(System.Nullable`1[System.Int32])
+                    )
+                    , 
+                    outerShaper: BufferedEntityShaper<ShopUserInfo>, 
+                    innerShaper: BufferedOffsetEntityShaper<UserBelongToShop>, 
+                    innerKeySelector: (UserBelongToShop b) => b.UserId, 
+                    resultSelector: (ShopUserInfo a | IAsyncEnumerable<UserBelongToShop> tmp) => TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>> CreateTransparentIdentifier(
+                        outer: a, 
+                        inner: tmp
+                    )
+                    , 
+                    outerGroupJoinInclude: default(Internal.AsyncGroupJoinInclude), 
+                    innerGroupJoinInclude: default(Internal.AsyncGroupJoinInclude)
+                )
+                , 
+                collectionSelector: (TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>> t0) => IAsyncEnumerable<UserBelongToShop> DefaultIfEmpty(
+                    source: t0.Inner
+                )
+                , 
+                resultSelector: (TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>> t0 | UserBelongToShop s) => TransparentIdentifier<TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>>, UserBelongToShop> CreateTransparentIdentifier(
+                    outer: t0, 
+                    inner: s
+                )
+            )
+            , 
+            selector: (TransparentIdentifier<TransparentIdentifier<ShopUserInfo, IAsyncEnumerable<UserBelongToShop>>, UserBelongToShop> t1) => new UserDto{ 
+                t1.Outer.Outer.UserIdUserId = t1.Outer.Outer.UserId, 
+                t1.Outer.Outer.UserNameUserName = t1.Outer.Outer.UserName, 
+                t1.Outer.Outer.RoleIdRoleId = t1.Outer.Outer.RoleId, 
+                t1.Outer.Outer.RoleNameRoleName = t1.Outer.Outer.RoleName, 
+                (Nullable<int>) t1.Inner.ShopId ?? (int) t1.Inner.ShopIdShopId = Convert((t1.Inner.ShopId ?? Convert(t1.Inner.ShopId))) 
+            }
+        )
+        , 
+        cancellationToken: queryContext.CancellationToken
+    )
+)
+ 
+2017-04-25 17:33:39.2098|3|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Opening connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 17:33:39.4825|1|Microsoft.EntityFrameworkCore.Storage.IRelationalCommandBuilderFactory|INFO|Executed DbCommand (87ms) [Parameters=[@__request_Role_2='?'], CommandType='Text', CommandTimeout='30']
+SELECT [a].[UserId], [a].[CreateTime], [a].[IsDelete], [a].[ModifyTime], [a].[Password], [a].[RealName], [a].[RoleId], [a].[RoleName], [a].[UserName], [b].[Id], [b].[ShopId], [b].[UserId]
+FROM [ShopUserInfo] AS [a]
+LEFT JOIN [UserBelongToShop] AS [b] ON [a].[UserId] = [b].[UserId]
+WHERE ([a].[UserName] IS NULL AND [a].[Password] IS NULL) AND ([a].[RoleId] = @__request_Role_2)
+ORDER BY [a].[UserId] 
+2017-04-25 17:33:39.5341|4|Microsoft.EntityFrameworkCore.Storage.Internal.SqlServerConnection|DEBUG|Closing connection to database 'OnlineFruit_Upgrade_V2' on server '.'. 
+2017-04-25 17:33:39.5908|1|Microsoft.AspNetCore.Mvc.Formatters.Json.Internal.JsonResultExecutor|INFO|Executing JsonResult, writing value MC.NetCore.ShopApp.ResponseBaseDto.BaseResult. 
+2017-04-25 17:33:39.6991|2|Microsoft.AspNetCore.Mvc.Internal.ControllerActionInvoker|INFO|Executed action MC.NetCore.ShopApp.Controllers.UserController.LoginOn (MC.NetCore.ShopApp) in 2048.5499ms 
+2017-04-25 17:33:39.7337|9|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNOJ7BMUF" completed keep alive response. 
+2017-04-25 17:33:39.7662|2|Microsoft.AspNetCore.Hosting.Internal.WebHost|INFO|Request finished in 2524.3935ms 500 application/json; charset=utf-8 
+2017-04-25 17:35:27.1309|6|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNOJ7BMUF" received FIN. 
+2017-04-25 17:35:27.1685|10|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNOJ7BMUF" disconnecting. 
+2017-04-25 17:35:27.1990|7|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNOJ7BMUF" sending FIN. 
+2017-04-25 17:35:27.2341|8|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNOJ7BMUF" sent FIN with status "0". 
+2017-04-25 17:35:27.2652|2|Microsoft.AspNetCore.Server.Kestrel|DEBUG|Connection id "0HL4BNOJ7BMUF" stopped. 
+2017-04-25 17:54:37.1055|5|Microsoft.AspNetCore.Hosting.Internal.WebHost|DEBUG|Hosting shutdown 

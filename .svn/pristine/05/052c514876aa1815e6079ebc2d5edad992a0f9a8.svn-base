@@ -1,0 +1,744 @@
+﻿using MC.NetCore.DomainModels;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace MC.NetCore.DataAccessSqlServerProvider
+{
+    public partial class ShopDbContext:DbContext
+    {
+        public virtual DbSet<GoodsPickingBatch> GoodsPickingBatch { get; set; }
+        public virtual DbSet<GoodsPickingDetail> GoodsPickingDetail { get; set; }
+        public virtual DbSet<ShopExtense> ShopExtense { get; set; }
+        public virtual DbSet<ProductExtense> ProductExtense { get; set; }
+        public virtual DbSet<BoutiqueOperationLog> BoutiqueOperationLog { get; set; }
+        public virtual DbSet<ProductLibrary> ProductLibrary { get; set; }
+        public virtual DbSet<Shop> Shop { get; set; }
+
+        public virtual DbSet<ShopUserInfo> ShopUserInfo { get; set; }
+        public virtual DbSet<UserBelongToShop> UserBelongToShop { get; set; }
+        public virtual DbSet<OrderForm> OrderForm { get; set; }
+        public virtual DbSet<OrderItemDetails> OrderItemDetails { get; set; }
+
+        /// <summary>
+        /// 自定义查询实体，在数据库不存在，使用FromSql 需要
+        /// 注意事项：
+        /// 1、为实体设置Key
+        /// 2、实体中的字段如果在查询语句中不存在，则需要在时体重标明[NotMapped]
+        /// </summary>
+        public virtual DbSet<DomainModels.Dto.ShopDto> ShopDto { get; set; }
+        public virtual DbSet<DomainModels.Dto.DeliveryShopDto> DeliverShopDto { get; set; }
+
+
+        public ShopDbContext()
+            : base()
+        {
+        }
+
+        public ShopDbContext(DbContextOptions<ShopDbContext> options) : base(options)
+        {
+
+        }
+
+
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ShopUserInfo>(entity =>
+            {
+                entity.HasKey(e => e.UserId)
+                    .HasName("PK_UserInfo_Id");
+
+                entity.Property(e => e.RoleId)
+                    .IsRequired();
+                entity.Property(e => e.RoleName)
+                    .IsRequired()
+                    .HasMaxLength(20);
+
+                entity.Property(e => e.UserName)
+                    .IsRequired()
+                    .HasMaxLength(20);
+                entity.Property(e => e.RealName)
+                    .HasMaxLength(20);
+                entity.Property(e => e.Password)
+                    .IsRequired()
+                    .HasMaxLength(50);
+                entity.Property(e => e.IsDelete)
+                    .IsRequired()
+                    .HasDefaultValue(0);
+
+                entity.Property(e => e.CreateTime)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("getdate()");
+                entity.Property(e => e.ModifyTime)
+                    .HasColumnType("datetime");
+            });
+
+            modelBuilder.Entity<UserBelongToShop>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.UserId)
+                    .IsRequired()
+                    .HasMaxLength(50);
+                entity.Property(e => e.ShopId);
+
+
+            });
+
+
+            modelBuilder.Entity<Shop>(entity =>
+            {
+                entity.Property(e => e.ShopId).HasColumnName("shopID");
+
+                entity.Property(e => e.AadminRole).HasColumnName("AAdminRole");
+
+                entity.Property(e => e.AapplyPayLimitDays).HasColumnName("AApplyPayLimitDays");
+
+                entity.Property(e => e.AapplyPayLimitMoney)
+                    .HasColumnName("AApplyPayLimitMoney")
+                    .HasColumnType("decimal");
+
+                entity.Property(e => e.Aarea)
+                    .HasColumnName("AArea")
+                    .HasDefaultValueSql("0");
+
+                entity.Property(e => e.AareaList)
+                    .HasColumnName("AAreaList")
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.AbillGenerateType).HasColumnName("ABillGenerateType");
+
+                entity.Property(e => e.AcertificateId).HasColumnName("ACertificateId");
+
+                entity.Property(e => e.Acity)
+                    .HasColumnName("ACity")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Acounty)
+                    .HasColumnName("ACounty")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.AcreateDate)
+                    .HasColumnName("ACreateDate")
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("getdate()");
+
+                entity.Property(e => e.Address)
+                    .HasColumnName("address")
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.Adistrict)
+                    .HasColumnName("ADistrict")
+                    .HasDefaultValueSql("0");
+
+                entity.Property(e => e.AdistrictId)
+                    .HasColumnName("ADistrictID")
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.Afrom)
+                    .HasColumnName("AFrom")
+                    .HasMaxLength(50)
+                    .HasDefaultValueSql("N'manager'");
+
+                entity.Property(e => e.AgroupId).HasColumnName("AGroupID");
+
+                entity.Property(e => e.AisForShop).HasColumnName("AIsForShop");
+
+                entity.Property(e => e.AisSetBillRule).HasColumnName("AIsSetBillRule");
+
+                entity.Property(e => e.AisShare).HasColumnName("AIsShare");
+
+                entity.Property(e => e.AmemDiscount)
+                    .HasColumnName("AMemDiscount")
+                    .HasColumnType("decimal");
+
+                entity.Property(e => e.AmodifyDate)
+                    .HasColumnName("AModifyDate")
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("getdate()");
+
+                entity.Property(e => e.Aowner).HasColumnName("AOwner");
+
+                entity.Property(e => e.ApplyTime).HasColumnType("datetime");
+
+                entity.Property(e => e.Aprovince)
+                    .HasColumnName("AProvince")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.AreaIds).HasColumnType("varchar(200)");
+
+                entity.Property(e => e.Asort)
+                    .HasColumnName("ASort")
+                    .HasDefaultValueSql("0");
+
+                entity.Property(e => e.Astatus)
+                    .HasColumnName("AStatus")
+                    .HasDefaultValueSql("0");
+
+                entity.Property(e => e.AuditTime).HasColumnType("datetime");
+
+                entity.Property(e => e.AverageCost)
+                    .HasColumnName("averageCost")
+                    .HasColumnType("decimal");
+
+                entity.Property(e => e.BusinessId).HasColumnName("businessID");
+
+                entity.Property(e => e.CloseTime)
+                    .HasColumnName("closeTime")
+                    .HasColumnType("varchar(20)");
+
+                entity.Property(e => e.CourseTypeIds)
+                    .HasColumnName("courseTypeIds")
+                    .HasColumnType("varchar(50)");
+
+                entity.Property(e => e.CourseTypeNames)
+                    .HasColumnName("courseTypeNames")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.Cx)
+                    .HasColumnName("CX")
+                    .HasColumnType("decimal");
+
+                entity.Property(e => e.Cy)
+                    .HasColumnName("CY")
+                    .HasColumnType("decimal");
+
+                entity.Property(e => e.DeliverRemark).HasMaxLength(200);
+
+                entity.Property(e => e.Discount)
+                    .HasColumnName("discount")
+                    .HasColumnType("decimal");
+
+                entity.Property(e => e.Distance).HasColumnName("distance");
+
+                entity.Property(e => e.Employees).HasMaxLength(20);
+
+                entity.Property(e => e.ExpressList).HasColumnType("varchar(500)");
+
+                entity.Property(e => e.ForshopIds)
+                    .HasColumnName("ForshopIDs")
+                    .HasColumnType("varchar(500)");
+
+                entity.Property(e => e.Groupid)
+                    .HasColumnName("groupid")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.ImagePath)
+                    .HasColumnName("imagePath")
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.Introduce).HasColumnName("introduce");
+
+                entity.Property(e => e.InvoiceTitles).HasMaxLength(200);
+
+                entity.Property(e => e.IsAppUse).HasColumnName("isAppUse");
+
+                entity.Property(e => e.IsDefault)
+                    .HasColumnName("isDefault")
+                    .HasDefaultValueSql("0");
+
+                entity.Property(e => e.IsSpecialFunds).HasDefaultValueSql("0");
+
+                entity.Property(e => e.IsWechatUse).HasColumnName("isWechatUse");
+
+                entity.Property(e => e.LogoUrl)
+                    .HasColumnName("logoUrl")
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.MinOrderMoney).HasColumnType("decimal");
+
+                entity.Property(e => e.OpenTime)
+                    .HasColumnName("openTime")
+                    .HasColumnType("varchar(20)");
+
+                entity.Property(e => e.PayQrCodePath).HasColumnType("varchar(100)");
+
+                entity.Property(e => e.QrcodePath)
+                    .HasColumnName("QRCodePath")
+                    .HasColumnType("varchar(100)");
+
+                entity.Property(e => e.Remark).HasMaxLength(200);
+
+                entity.Property(e => e.ServiceDescription)
+                    .HasColumnName("serviceDescription")
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.ServiceLevel).HasColumnName("serviceLevel");
+
+                entity.Property(e => e.ServiceUrl)
+                    .HasColumnName("serviceUrl")
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.ShopInviCode).HasColumnType("varchar(50)");
+
+                entity.Property(e => e.ShopLeftMoney).HasColumnType("decimal");
+
+                entity.Property(e => e.ShopLinkName)
+                    .HasColumnName("shopLinkName")
+                    .HasMaxLength(20);
+
+                entity.Property(e => e.ShopLinkTel)
+                    .HasColumnName("shopLinkTel")
+                    .HasColumnType("varchar(20)");
+
+                entity.Property(e => e.ShopName)
+                    .HasColumnName("shopName")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.Telephone)
+                    .HasColumnName("telephone")
+                    .HasColumnType("varchar(50)");
+
+                entity.Property(e => e.ThumbnailPath)
+                    .HasColumnName("thumbnailPath")
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.Typeid).HasColumnName("typeid");
+            });
+            modelBuilder.Entity<ShopExtense>(entity =>
+            {
+                entity.HasKey(e => e.ShopExtId)
+                    .HasName("PK_ShopExtID");
+
+                entity.Property(e => e.ShopExtId)
+                    .HasColumnName("ShopExtID")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.CurrentAmount).HasColumnType("decimal");
+
+                entity.Property(e => e.ShopId).HasColumnName("ShopID");
+
+                entity.Property(e => e.TotalAmount).HasColumnType("decimal");
+            });
+            modelBuilder.Entity<GoodsPickingBatch>(entity =>
+            {
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.DeliveryStatus).HasDefaultValueSql("1");
+
+                entity.Property(e => e.PickManId)
+                    .IsRequired()
+                    .HasMaxLength(50);
+                entity.Property(e => e.PickMan)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.PickTime)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("getdate()");
+
+                entity.Property(e => e.ShopId).HasColumnName("ShopID");
+
+                entity.Property(e => e.ShopName).HasMaxLength(50);
+            });
+            modelBuilder.Entity<GoodsPickingDetail>(entity =>
+            {
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.PickBatchId)
+                    .IsRequired()
+                    .HasColumnName("PickBatchID")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.ProductId).HasColumnName("ProductID");
+
+                entity.Property(e => e.ProductName).HasMaxLength(100);
+            });
+
+            modelBuilder.Entity<BoutiqueOperationLog>(entity =>
+            {
+                entity.Property(e => e.Id)
+                    .HasColumnName("ID")
+                    .HasMaxLength(50);
+                entity.Property(e => e.DeliveryManId)
+                    .IsRequired()
+                    .HasMaxLength(50);
+                entity.Property(e => e.DeliveryMan)
+                    .IsRequired()
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.OperationDateTime)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("getdate()");
+
+                entity.Property(e => e.ProductId).HasColumnName("ProductID");
+
+                entity.Property(e => e.ShopId).HasColumnName("ShopID");
+            });
+
+            modelBuilder.Entity<ProductLibrary>(entity =>
+            {
+                entity.HasKey(e => e.ProductId)
+                    .HasName("PK_ProductLibrary");
+
+                entity.Property(e => e.AcreateDate)
+                    .HasColumnName("ACreateDate")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.AmodifyDate)
+                    .HasColumnName("AModifyDate")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.AspecialType).HasColumnName("ASpecialType");
+
+                entity.Property(e => e.AsportsType).HasColumnName("ASportsType");
+
+                entity.Property(e => e.Astatus).HasColumnName("AStatus");
+
+                entity.Property(e => e.Attributes).HasMaxLength(500);
+
+                entity.Property(e => e.AvgCommentScore).HasColumnType("decimal");
+
+                entity.Property(e => e.BookBeginTime).HasColumnType("varchar(20)");
+
+                entity.Property(e => e.BookEndTime).HasColumnType("varchar(20)");
+
+                entity.Property(e => e.DiscountPrice).HasColumnType("decimal");
+
+                entity.Property(e => e.IsAvailable).HasColumnName("isAvailable");
+
+                entity.Property(e => e.IsImportFood).HasColumnName("isImportFood");
+
+                entity.Property(e => e.IsOrganicFood).HasColumnName("isOrganicFood");
+
+                entity.Property(e => e.LeastbuyMg)
+                    .HasColumnName("leastbuy_mg")
+                    .HasColumnType("decimal");
+
+                entity.Property(e => e.LongDescription).HasColumnName("long_description");
+
+                entity.Property(e => e.MemberDiscount)
+                    .HasColumnType("decimal")
+                    .HasDefaultValueSql("10.0");
+
+                entity.Property(e => e.MinQuantity).HasDefaultValueSql("1");
+
+                entity.Property(e => e.Mode).HasColumnName("mode");
+
+                entity.Property(e => e.Plunum)
+                    .IsRequired()
+                    .HasColumnName("PLUNum")
+                    .HasColumnType("varchar(50)");
+
+                entity.Property(e => e.PollingImg1).HasMaxLength(100);
+
+                entity.Property(e => e.PollingImg2).HasMaxLength(100);
+
+                entity.Property(e => e.PollingImg3).HasMaxLength(100);
+
+                entity.Property(e => e.Price).HasColumnType("decimal");
+
+                entity.Property(e => e.ProductCode)
+                    .HasColumnName("productCode")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.ProductName)
+                    .HasColumnName("productName")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.Ptype).HasColumnName("PType");
+
+                entity.Property(e => e.QrcodeImg).HasMaxLength(500);
+
+                entity.Property(e => e.ShortDescription)
+                    .HasColumnName("short_description")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.SpId).HasColumnName("spID");
+
+                entity.Property(e => e.Tags).HasMaxLength(200);
+
+                entity.Property(e => e.Thumbnail)
+                    .HasColumnName("thumbnail")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.TimePrecision).HasColumnType("varchar(20)");
+
+                entity.Property(e => e.TypeIds).HasColumnType("varchar(200)");
+
+                entity.Property(e => e.TypeNames).HasMaxLength(500);
+
+                entity.Property(e => e.UnitName).HasMaxLength(20);
+            });
+            modelBuilder.Entity<ProductExtense>(entity =>
+            {
+                entity.HasKey(e => e.ProductExtId)
+                    .HasName("PK_ProductExtID");
+
+                entity.Property(e => e.ProductExtId)
+                    .HasColumnName("ProductExtID")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.ProductId).HasColumnName("ProductID");
+
+                entity.Property(e => e.ShopId).HasColumnName("ShopID");
+                entity.Property(e => e.CurrentCount);
+                entity.Property(e => e.TotalCount);
+            });
+
+            modelBuilder.Entity<OrderForm>(entity =>
+            {
+                entity.HasKey(e => e.OrderId)
+                    .HasName("PK_OrderForm");
+
+                entity.Property(e => e.OrderId).HasColumnName("orderID");
+
+                entity.Property(e => e.AbalanceStatusTwo).HasColumnName("ABalanceStatusTwo");
+
+                entity.Property(e => e.AcardDymoney)
+                    .HasColumnName("ACardDYMoney")
+                    .HasColumnType("decimal");
+
+                entity.Property(e => e.AdiliveryType).HasColumnName("ADiliveryType");
+
+                entity.Property(e => e.AgroundStartTime)
+                    .HasColumnName("AGroundStartTime")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.AinvoiceMoney)
+                    .HasColumnName("AInvoiceMoney")
+                    .HasColumnType("decimal");
+
+                entity.Property(e => e.AisQianDao).HasColumnName("AIsQianDao");
+
+                entity.Property(e => e.AneedBalanceTwo).HasColumnName("ANeedBalanceTwo");
+
+                entity.Property(e => e.AorderActualMoney)
+                    .HasColumnName("AOrderActualMoney")
+                    .HasColumnType("decimal");
+
+                entity.Property(e => e.AorderGroupId)
+                    .HasColumnName("AOrderGroupId")
+                    .HasColumnType("varchar(50)");
+
+                entity.Property(e => e.AorderType).HasColumnName("AOrderType");
+
+                entity.Property(e => e.Apptype).HasColumnName("APPType");
+
+                entity.Property(e => e.AprojectName)
+                    .HasColumnName("AProjectName")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.AqianDaoTime)
+                    .HasColumnName("AQianDaoTime")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.AsportsType).HasColumnName("ASportsType");
+
+                entity.Property(e => e.Awltype).HasColumnName("AWLType");
+
+                entity.Property(e => e.Cashpay)
+                    .HasColumnName("cashpay")
+                    .HasColumnType("decimal");
+
+                entity.Property(e => e.Cashreceive)
+                    .HasColumnName("cashreceive")
+                    .HasColumnType("decimal");
+
+                entity.Property(e => e.Comments).HasMaxLength(500);
+
+                entity.Property(e => e.ConsumeType).HasColumnName("consumeType");
+
+                entity.Property(e => e.CustomerComments)
+                    .HasColumnName("customerComments")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.DiliveryAddress)
+                    .HasColumnName("diliveryAddress")
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.DiliveryCost)
+                    .HasColumnName("diliveryCost")
+                    .HasColumnType("decimal");
+
+                entity.Property(e => e.DiliveryPersonId).HasColumnName("diliveryPersonID");
+
+                entity.Property(e => e.DiliveryRemark)
+                    .HasColumnName("diliveryRemark")
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.DiliveryTimeDescription)
+                    .HasColumnName("diliveryTimeDescription")
+                    .HasMaxLength(100);
+
+                entity.Property(e => e.Discount).HasColumnType("decimal");
+
+                entity.Property(e => e.ExpressCode).HasColumnType("varchar(50)");
+
+                entity.Property(e => e.ExpressCompany).HasMaxLength(50);
+
+                entity.Property(e => e.ExpressNum).HasColumnType("varchar(50)");
+
+                entity.Property(e => e.FeedBackLevel).HasColumnName("feedBackLevel");
+
+                entity.Property(e => e.InvoiceName).HasMaxLength(100);
+
+                entity.Property(e => e.IsComment).HasDefaultValueSql("0");
+
+                entity.Property(e => e.IssueDescription)
+                    .HasColumnName("issueDescription")
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.MemberAddressId).HasColumnName("memberAddressID");
+
+                entity.Property(e => e.MemberId)
+                    .IsRequired()
+                    .HasColumnName("memberID")
+                    .HasColumnType("varchar(100)");
+
+                entity.Property(e => e.MrichHandlingCharge).HasColumnType("decimal");
+
+                entity.Property(e => e.MrichServiceCharge).HasColumnType("decimal");
+
+                entity.Property(e => e.OpenId)
+                    .IsRequired()
+                    .HasColumnName("openID")
+                    .HasColumnType("varchar(50)");
+
+                entity.Property(e => e.OrderAcceptTime)
+                    .HasColumnName("orderAcceptTime")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.OrderActualDiliveryTime)
+                    .HasColumnName("orderActualDiliveryTime")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.OrderActualMoney)
+                    .HasColumnName("orderActualMoney")
+                    .HasColumnType("decimal");
+
+                entity.Property(e => e.OrderCode)
+                    .IsRequired()
+                    .HasColumnName("orderCode")
+                    .HasMaxLength(50);
+
+                entity.Property(e => e.OrderContent)
+                    .IsRequired()
+                    .HasColumnName("orderContent")
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.OrderFinishTime)
+                    .HasColumnName("orderFinishTime")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.OrderMoney)
+                    .HasColumnName("orderMoney")
+                    .HasColumnType("decimal");
+
+                entity.Property(e => e.OrderMonth)
+                    .HasColumnName("orderMonth")
+                    .HasDefaultValueSql("datepart(month,getdate())");
+
+                entity.Property(e => e.OrderOutMoney)
+                    .HasColumnName("orderOutMoney")
+                    .HasColumnType("decimal");
+
+                entity.Property(e => e.OrderReceiverMobile).HasColumnType("varchar(11)");
+
+                entity.Property(e => e.OrderReceiverName).HasMaxLength(50);
+
+                entity.Property(e => e.OrderTime)
+                    .HasColumnName("orderTime")
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("getdate()");
+
+                entity.Property(e => e.OrderYear)
+                    .HasColumnName("orderYear")
+                    .HasDefaultValueSql("datepart(year,getdate())");
+
+                entity.Property(e => e.ParentPaymentTypeId).HasColumnName("parentPaymentTypeID");
+
+                entity.Property(e => e.PayStatus)
+                    .HasColumnName("payStatus")
+                    .HasDefaultValueSql("0");
+
+                entity.Property(e => e.PayTime)
+                    .HasColumnName("payTime")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.PaymentType)
+                    .HasColumnName("paymentType")
+                    .HasMaxLength(20);
+
+                entity.Property(e => e.PaymentTypeId).HasColumnName("paymentTypeID");
+
+                entity.Property(e => e.RefundMoney)
+                    .HasColumnName("refundMoney")
+                    .HasColumnType("decimal");
+
+                entity.Property(e => e.ReplyContent).HasMaxLength(240);
+
+                entity.Property(e => e.ReplyTime).HasColumnType("datetime");
+
+                entity.Property(e => e.SaveMoney).HasColumnType("decimal");
+
+                entity.Property(e => e.ShopId).HasColumnName("shopID");
+
+                entity.Property(e => e.ShopIdex).HasColumnName("shopIDEX");
+
+                entity.Property(e => e.Status)
+                    .HasColumnName("status")
+                    .HasDefaultValueSql("1");
+
+                entity.Property(e => e.WxhandlingCharge)
+                    .HasColumnName("WXHandlingCharge")
+                    .HasColumnType("decimal");
+            });
+
+            modelBuilder.Entity<OrderItemDetails>(entity =>
+            {
+                entity.HasKey(e => e.OrderItemId)
+                    .HasName("PK_OrderItemDetails");
+
+                entity.Property(e => e.AskuId)
+                    .HasColumnName("ASkuId")
+                    .HasColumnType("varchar(100)");
+
+                entity.Property(e => e.AtimeDu)
+                    .HasColumnName("ATimeDu")
+                    .HasColumnType("varchar(20)");
+
+                entity.Property(e => e.AtimeE)
+                    .HasColumnName("ATimeE")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.AtimeS)
+                    .HasColumnName("ATimeS")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.Attr).HasMaxLength(500);
+
+                entity.Property(e => e.Baseproductid).HasColumnName("baseproductid");
+
+                entity.Property(e => e.Detail)
+                    .HasColumnName("detail")
+                    .HasMaxLength(500);
+
+                entity.Property(e => e.Dt)
+                    .HasColumnName("dt")
+                    .HasColumnType("datetime");
+
+                entity.Property(e => e.OrderCode).HasColumnType("varchar(50)");
+
+                entity.Property(e => e.PurchasePrice).HasColumnType("decimal");
+
+                entity.Property(e => e.WeightG)
+                    .HasColumnName("weight_g")
+                    .HasColumnType("decimal");
+            });
+
+
+
+
+
+
+        }
+    }
+}

@@ -1,0 +1,11 @@
+﻿{
+  "ConnectionStrings": {
+    "SqlServerConnection": "Data Source=.;Initial Catalog=OnlineFruit_Upgrade_V2;User ID=sa;Password=Sa123456;MultipleActiveResultSets=true"
+  },
+  "Logging": {
+    "IncludeScopes": false,
+    "LogLevel": {
+      "Default": "Warning"
+    }
+  }
+}

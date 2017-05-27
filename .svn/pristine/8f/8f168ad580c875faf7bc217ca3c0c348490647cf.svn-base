@@ -1,0 +1,84 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace MC.NetCore.ShopApp.Filters
+{
+    public class LoginCheckFilterAttribute: ActionFilterAttribute
+    {
+        public LoginCheckFilterAttribute()
+        {
+            IsCheck = true;
+        }
+
+        //表示是否检查登录
+        public bool IsCheck { get; set; }
+
+        //Action方法执行之前执行此方法
+        public override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+
+            if (IsCheck)
+            {
+                var  httpCookie = filterContext.HttpContext.Request.Cookies["userId"];
+
+                if (!VolidateToken(httpCookie))
+                {
+                    ReturnNoLoginStatus(filterContext);
+                    return;
+                }
+                if (filterContext.HttpContext.Session != null)
+                {
+                    var user = filterContext.HttpContext.Session.Get("user");
+                    if (user == null)
+                    {
+                        ReturnNoLoginStatus(filterContext);
+                        return;
+                    }
+                }
+                else
+                {
+                    filterContext.HttpContext.Response.Clear();
+                    filterContext.HttpContext.Response.Redirect("/User/LoginOn", true);
+                    //filterContext.HttpContext.Response.BufferOutput = true;
+                    //if (!filterContext.HttpContext.Response.IsRequestBeingRedirected)
+                    //{
+                    //    filterContext.HttpContext.Response.Redirect((new UrlHelper(filterContext.RequestContext)).Content("/Login/Index"), true);
+                    //}
+                }
+
+
+            }
+            base.OnActionExecuting(filterContext);
+        }
+
+        private static void ReturnNoLoginStatus(ActionExecutingContext filterContext)
+        {
+            //mvc6 判断是否是ajax请求
+            //http://stackoverflow.com/questions/29282190/where-is-request-isajaxrequest-in-asp-net-core-mvc
+            var isAjax = filterContext.HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest";
+            if (isAjax)
+            {
+                var json = new JsonResult(new ResponseBaseDto.BaseResult {
+                    StatusCode = filterContext.HttpContext.Response.StatusCode,
+                    Value = null });
+                filterContext.Result = json;
+            }
+            
+        }
+
+        private bool VolidateToken(string httpCookie)
+        {
+            string token = httpCookie;
+            if (string.IsNullOrEmpty(token))
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+}

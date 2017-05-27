@@ -1,0 +1,24 @@
+﻿using MC.NetCore.DomainModels;
+using MC.NetCore.DomainModels.Dto;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MC.NetCore.Repository
+{
+    public interface IProductRepository
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="shopId">商铺Id</param>
+        /// <param name="lastPickTime">上次拣货时间</param>
+        /// <param name="pickTime">本次拣货时间</param>
+        /// <returns></returns>
+        Task<IList<ProductDto>> GetProductList(int shopId,DateTime? lastPickTime, DateTime? pickTime);
+        Task<IList<DeliveryProductDto>> GetDeliveryProductList(int shopId);
+        Task<IList<ProductLibrary>> GetProductListByShopId(HashSet<int> shopIds);
+        Task<ProductLibrary> GetProductListByProductId(int productIds);
+    }
+}

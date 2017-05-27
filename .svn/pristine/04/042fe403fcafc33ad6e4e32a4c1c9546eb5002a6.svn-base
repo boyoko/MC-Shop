@@ -1,0 +1,77 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Cors;
+using MC.NetCore.Repository;
+using MC.NetCore.ShopApp.ResponseBaseDto;
+using MC.NetCore.DomainModels.RequestDto;
+using Microsoft.AspNetCore.Http;
+using MC.NetCore.DomainModels.Dto;
+using MC.NetCore.ShopApp.Extension;
+
+namespace MC.NetCore.ShopApp.Controllers
+{
+    [Route("api/[controller]/[action]")]
+    [EnableCors("AllowAnyDomain")]
+    public class UserController : Controller
+    {
+        private readonly IShopUserRepository _shopUserRepository;
+
+        public UserController(IShopUserRepository shopUserRepository)
+        {
+            _shopUserRepository = shopUserRepository;
+        }
+
+        public IActionResult LoginOn()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> LoginOn([FromBody]LoginOnRequestDto request)
+        {
+            try
+            {
+                var result = await _shopUserRepository.LoginOn(request);
+                if (result != null)
+                {
+                    //…Ë÷√cookie
+                    Response.Cookies.Append("userId", result.UserId);
+                    //…Ë÷√session
+                    HttpContext.Session.Set<UserDto>("user", result);
+                    return new ObjectResult(new BaseResult { StatusCode = Response.StatusCode, Value = result });
+                }
+                return new ObjectResult(new BaseResult { StatusCode = 400, ErrorMessage= "µ«¬º ß∞‹£°" });
+
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(new BaseResult { StatusCode = Response.StatusCode, ErrorMessage = ex.Message });
+            }
+            
+        }
+
+
+        
+
+        public ActionResult Logout()
+        {
+            var httpCookie = Request.Cookies["userId"];
+            if (!string.IsNullOrEmpty(httpCookie))
+            {
+                Response.Cookies.Delete("userId");
+            }
+
+            if (HttpContext.Session.Get("user") != null)
+            {
+                HttpContext.Session.Remove("user");
+                HttpContext.Session.Clear();
+            }
+
+            return Redirect("/User/LoginOn");
+        }
+
+    }
+}

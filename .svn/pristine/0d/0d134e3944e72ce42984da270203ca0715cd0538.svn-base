@@ -1,0 +1,230 @@
+﻿using MC.NetCore.DomainModels;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using MC.NetCore.DomainModels.Dto;
+using System.Threading.Tasks;
+using MC.NetCore.DataAccessSqlServerProvider;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Text.RegularExpressions;
+
+namespace MC.NetCore.Repository
+{
+    public class ShopRepository : Repository<Shop>, IShopRepository
+    {
+        private readonly ShopDbContext _shopDbContext;
+        public ShopRepository(ShopDbContext context)
+        {
+            _shopDbContext = context;
+        }
+
+        public async Task<IList<ShopDto>> GetShopList(int? shopId, string shopName)
+        {
+            try
+            {
+                var result = new List<ShopDto>();
+                result = await (from shop in _shopDbContext.Shop.AsNoTracking()
+                                where (shop.CourseTypeIds == "2561" || shop.CourseTypeIds == "2561,")
+                                && shop.Astatus == 0 && (!shopId.HasValue || shop.ShopId == shopId)
+                                && (string.IsNullOrEmpty(shopName) || shop.ShopName.Contains(shopName))
+                                select new ShopDto
+                                {
+                                    ShopId = shop.ShopId,
+                                    ShopName = shop.ShopName,
+                                }).ToListAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public async Task<IList<ShopDto>> GetShopList()
+        {
+            var result = new List<ShopDto>();
+            try
+            {
+                var first = _shopDbContext.GoodsPickingBatch.FirstOrDefault();
+                //第一次捡货
+                if (first == null)
+                {
+                    result = await (from shop in _shopDbContext.Shop.AsNoTracking()
+                                    where shop.CourseTypeIds == "2561"
+                                    && shop.IsEnable == true
+                                    select new ShopDto
+                                    {
+                                        ShopId = shop.ShopId,
+                                        ShopName = shop.ShopName,
+                                    }).ToListAsync();
+
+                }
+                else
+                {
+                    /*
+                     销售额：（上一次拣货时间 到 当前时间） 这段时间内的每个商铺售卖的商铺总价
+                     
+                     */
+
+                    var sql = @"SELECT * FROM
+                                (SELECT  ROW_NUMBER() OVER (PARTITION BY s.shopID ORDER BY b.PickTime DESC) AS Id
+                                ,s.shopID,s.shopName,b.PickTime,b.PickManId,b.PickMan
+                                ,(SELECT SUM(sub.PurchasePrice * sub.Quantity) AS TotalAmount　FROM dbo.OrderItemDetails AS sub
+									INNER JOIN dbo.OrderForm AS main
+									ON main.orderCode = sub.OrderCode
+									WHERE main.status=4
+									AND main.shopID = s.shopID
+									AND dt BETWEEN b.PickTime AND GETDATE()) AS TotalAmount
+                                FROM dbo.Shop AS s
+                                LEFT OUTER JOIN dbo.GoodsPickingBatch AS b 
+                                ON b.ShopID = s.shopID
+                                WHERE s.courseTypeIds='2561'
+								AND s.isenable = 1
+                                ) AS tmp 
+                                WHERE tmp.Id=1";
+                    result = await _shopDbContext.Set<ShopDto>()
+                                    .FromSql<ShopDto>(sql)
+                                    .AsNoTracking()
+                                    .ToListAsync();
+
+
+
+                    //var x = (from shop in _shopDbContext.Shop.AsNoTracking()
+                    //         join main in _shopDbContext.GoodsPickingBatch.AsNoTracking()
+                    //         on shop.ShopId equals main.ShopId into temp
+                    //         where shop.CourseTypeIds == "2561"
+                    //         && shop.IsEnable == true
+                    //         from s in temp.DefaultIfEmpty()
+                    //         group s by s.ShopId into g
+                    //         where g.Key != null
+                    //         select new ShopDto
+                    //         {
+                    //             ShopId = g.Key,
+                    //         });
+
+                    //foreach(var a in x)
+                    //{
+                    //    ShopDto dto = new ShopDto
+                    //    {
+                    //        ShopId = a.Key,
+                    //        ShopName = a.FirstOrDefault(c => c.ShopId == a.Key).ShopName,
+                    //        //PickTime = a.FirstOrDefault(c => c.ShopId == a.Key).PickTime
+                    //    };
+                    //    result.Add(dto);
+                    //}
+
+                    //result.ForEach(c => c.TotalAmount = GetTotal(c.ShopId, c.PickBatchId));
+
+
+                }
+
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+        }
+
+
+
+        public async Task<IList<DeliveryShopDto>> GetDeliverShopList()
+        {
+            var result = new List<DeliveryShopDto>();
+            try
+            {
+                var first = _shopDbContext.GoodsPickingBatch.FirstOrDefault();
+                //第一次配送
+                if (first == null)
+                {
+                    result = await (from shop in _shopDbContext.Shop.AsNoTracking()
+                                    where shop.CourseTypeIds == "2561"
+                                    && shop.IsEnable == true
+                                    select new DeliveryShopDto
+                                    {
+                                        DeliveryStatus = 0,
+                                        ShopId = shop.ShopId,
+                                        ShopName = shop.ShopName,
+                                        Surplus = 0,
+                                        Distance = "获取定位失败！",
+                                    }).ToListAsync();
+
+                }
+                else
+                {
+
+                    var sql = @"SELECT *
+                                 FROM
+	                                (
+	                                SELECT  ROW_NUMBER() OVER (PARTITION BY s.shopID ORDER BY b.OperationDateTime DESC) AS Id
+	                                ,ISNULL(g.DeliveryStatus,0) as DeliveryStatus
+	                                ,s.shopID,s.shopName,b.OperationDateTime as DeliveryTime
+	                                ,b.DeliveryManId,b.DeliveryMan
+	                                ,(SELECT SUM(p.Price * d.PickAmount)
+		                                FROM dbo.ProductLibrary AS p
+		                                INNER JOIN dbo.GoodsPickingDetail AS d
+		                                ON p.ProductId=d.ProductID
+		                                WHERE d.PickBatchID = b.ID) AS Surplus
+	                                FROM dbo.Shop AS s
+		                                LEFT OUTER JOIN dbo.BoutiqueOperationLog AS b 
+		                                ON b.ShopID = s.shopID
+		                                LEFT OUTER JOIN dbo.GoodsPickingBatch AS g
+		                                ON b.ShopID = g.shopID
+	                                WHERE s.courseTypeIds='2561'
+                                ) AS tmp 
+                                WHERE tmp.Id=1";
+                    result = await _shopDbContext.Set<DeliveryShopDto>()
+                                    .FromSql<DeliveryShopDto>(sql)
+                                    .AsNoTracking()
+                                    .ToListAsync();
+
+                }
+
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="productId">商铺Id</param>
+        /// <param name="batchId">捡货批次</param>
+        /// <returns></returns>
+        private decimal GetTotal(int shopId, string batchId)
+        {
+            decimal total = 0;
+            //商铺某一批次捡货的产品和数量
+            var productListInShop = (from main in _shopDbContext.GoodsPickingBatch.AsNoTracking()
+                                     join sub in _shopDbContext.GoodsPickingDetail.AsNoTracking()
+                                     on main.Id equals sub.PickBatchId
+                                     where sub.PickBatchId == batchId
+                                     select new
+                                     {
+                                         sub.ProductId,
+                                         sub.PickAmount
+                                     }).ToList();
+
+
+            foreach (var x in productListInShop)
+            {
+                var price = _shopDbContext.ProductLibrary.AsNoTracking()
+                            .FirstOrDefault(a => a.SpId == shopId && a.ProductId == x.ProductId)?.Price;
+
+                total += Convert.ToDecimal(x.PickAmount * price);
+            }
+
+
+            return total;
+        }
+
+
+
+    }
+}

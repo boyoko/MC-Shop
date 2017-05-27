@@ -1,0 +1,171 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using MC.NetCore.Repository;
+using MC.NetCore.DomainModels.RequestDto;
+using MC.NetCore.DomainModels;
+using Microsoft.AspNetCore.Cors;
+using MC.NetCore.ShopApp.ResponseBaseDto;
+using MC.NetCore.ShopApp.Filters;
+using Microsoft.Extensions.Logging;
+using MC.NetCore.DomainModels.Dto;
+using MC.NetCore.ShopApp.Extension;
+
+namespace MC.NetCore.ShopApp.Controllers
+{
+    [Route("api/[controller]/[action]")]
+    [EnableCors("AllowAnyDomain")]
+    [LoginCheckFilter(IsCheck = true)]
+    public class PickUpController : Controller
+    {
+        private readonly IShopRepository _shopRepository;
+        private readonly IProductRepository _productRepository;
+        private readonly IPickUpRepository _pickUpRepository;
+        private readonly IShopUserRepository _shopUserRepository;
+        private ILogger<PickUpController> _logger;
+
+        private UserDto currentUser
+        {
+            get
+            {
+                UserDto user = HttpContext.Session.Get<UserDto>("user") as UserDto;
+                return user;
+            }
+
+        }
+
+        public PickUpController(IShopRepository shopRepository
+            ,IProductRepository productRepository
+            ,IPickUpRepository pickUpRepository
+            ,IShopUserRepository shopUserRepository
+            ,ILogger<PickUpController> logger)
+        {
+            _shopRepository = shopRepository;
+            _productRepository = productRepository;
+            _pickUpRepository = pickUpRepository;
+            _shopUserRepository = shopUserRepository;
+            _logger = logger;
+        }
+
+
+        [HttpGet]
+        //[Route("api/picker/shops")]
+        public IActionResult Index()
+        {
+            try
+            {
+                var list = _shopRepository.GetShopList().GetAwaiter().GetResult();
+                return new ObjectResult(new BaseResult { StatusCode = Response.StatusCode, Value = list });
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError("Index:" + ex.Message);
+                throw;
+            }
+
+        }
+
+        /// <summary>
+        /// 获取配送员列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> GetDeliverList()
+        {
+            var list = await _shopUserRepository.GetDeliverList();
+            return new ObjectResult(new BaseResult
+            {
+                StatusCode = Response.StatusCode,
+                Value = list
+            });
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="shopId">商铺Id</param>
+        /// <param name="lastPickTime">上次拣货时间</param>
+        /// <param name="pickTime">本次拣货时间</param>
+        /// <returns></returns>
+        //[Route("api/picker/Products/{id:int}")]
+        public IActionResult PickProducts(int? shopId, DateTime? lastPickTime ,DateTime?pickTime)
+        {
+
+            if (!shopId.HasValue)
+                throw new ArgumentNullException(nameof(shopId));
+            if(!pickTime.HasValue)
+                throw new ArgumentNullException(nameof(pickTime));
+
+            var list = _productRepository.GetProductList(shopId.Value,null,null).GetAwaiter().GetResult();
+            //ViewBag.ShopId = shopId;
+            return new ObjectResult(new BaseResult
+            {
+                StatusCode = Response.StatusCode,
+                Value = list
+            });
+
+            //try
+            //{
+            //    if (!shopId.HasValue)
+            //        throw new ArgumentNullException(nameof(shopId));
+            //    var list = _productRepository.GetProductList(shopId.Value).GetAwaiter().GetResult();
+            //    ViewBag.ShopId = shopId;
+            //    return new ObjectResult(new BaseResult
+            //    {
+            //        StatusCode = Response.StatusCode,
+            //        Value = list
+            //    });
+                
+            //}
+            //catch(Exception ex)
+            //{
+            //    var error = new
+            //    {
+            //        message = ex.Message,
+            //        status = Microsoft.AspNetCore.Http.StatusCodes.Status500InternalServerError
+            //    };
+            //    Response.StatusCode = error.status;
+            //    return StatusCode(Response.StatusCode, ex.Message);
+            //}
+            
+            
+        }
+
+        [HttpPost]
+        //[Route("api/picker/Products")]
+        public async Task<IActionResult> PickProducts([FromBody]PickUpProductsRequestDto model)
+        {
+            var batId = Guid.NewGuid().ToString();
+            GoodsPickingBatch bat = new GoodsPickingBatch
+            {
+                Id = batId,
+                DeliveryStatus = 1,
+                PickManId = currentUser?.UserId,
+                PickMan = currentUser?.UserName,
+                PickTime = model.PickStartTime, 
+                ShopId = model.ShopId,
+                ShopName = model.ShopName
+            };
+            List<GoodsPickingDetail> list = new List<GoodsPickingDetail>();
+            foreach (var x in model.ProductList)
+            {
+                GoodsPickingDetail detail = new GoodsPickingDetail
+                {
+                    PickBatchId = batId,
+                    ProductId = x.ProductId,
+                    ProductName = x.ProductName,
+                    PickAmount = x.ProductCount,
+                };
+                list.Add(detail);
+            }
+            var flag = await _pickUpRepository.PickUp(bat, list);
+            return new ObjectResult(new BaseResult
+            {
+                StatusCode = Response.StatusCode,
+                Value = flag
+            });
+        }
+    }
+}

@@ -1,0 +1,68 @@
+﻿@using MC.NetCore.DomainModels.Dto
+@model IList<MC.NetCore.DomainModels.Dto.ShopDto>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width" />
+        <title>小铺列表</title>
+    </head>
+    <body>
+        <div>
+            <div>
+                <input type="text" placeholder="搜索名字" />
+                <input type="button" value="筛选" />
+            </div>
+            <div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>名称</th>
+                            <th>销售额</th>
+                            <th>上次时间</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            foreach (var s in Model)
+                            {
+                                <tr>
+                                    <td></td>
+                                    <td>@s.ShopName</td>
+                                    <td>@s.TotalAmount</td>
+                                    @{
+                                        if (s.PickTime.HasValue)
+                                        {
+                                            <td>@s.PickTime.Value</td>
+                                        }
+                                        else
+                                        {
+                                            <td></td>
+                                        }
+                                    }
+                                    <td><input type="button" value="捡货" onclick="ShowShopDetail(@s.ShopId)" /></td>
+                                </tr>
+
+                            }
+                        }
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script>
+            function ShowShopDetail(shopId) {
+                window.location.href = "/PickUp/PickProducts?shopId=" + shopId;
+            }
+        </script>
+
+    </body>
+</html>

@@ -1,0 +1,114 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using MC.NetCore.DomainModels.Dto;
+using MC.NetCore.DataAccessSqlServerProvider;
+using MC.NetCore.DomainModels;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using MC.NetCore.Common.Extensions;
+
+namespace MC.NetCore.Repository
+{
+    public class ProductRepository :Repository<ProductLibrary>, IProductRepository,IDisposable
+    {
+        private readonly ShopDbContext _shopDbContext;
+        public ProductRepository(ShopDbContext shopDbContext)
+        {
+            _shopDbContext = shopDbContext;
+        }
+
+        public async Task<IList<ProductLibrary>> GetProductListByShopId(HashSet<int> shopIds)
+        {        
+            return await (from p in _shopDbContext.ProductLibrary.AsNoTracking()
+                          where shopIds.Contains(p.SpId.HasValue ? p.SpId.Value : 0)
+                          select p).ToListAsync();
+        }
+
+        public async Task<ProductLibrary> GetProductListByProductId(int productId)
+        {
+            return await (from p in _shopDbContext.ProductLibrary.AsNoTracking()
+                          where productId == p.ProductId
+                          select p).FirstOrDefaultAsync();
+        }
+
+        public async Task<IList<DeliveryProductDto>> GetDeliveryProductList(int shopId)
+        {
+            var productList =await (from p in _shopDbContext.ProductLibrary.AsNoTracking()
+                               join px in _shopDbContext.ProductExtense.AsNoTracking()
+                               on p.ProductId equals px.ProductId
+                               join d in _shopDbContext.GoodsPickingDetail.AsNoTracking()
+                               on p.ProductId equals d.ProductId into tmp
+                               let lastBatchId = (_shopDbContext.GoodsPickingBatch
+                                .OrderByDescending(a => a.PickTime)
+                                .FirstOrDefault(a => a.ShopId == shopId && (a.DeliveryStatus == 1 || a.DeliveryStatus == 2))
+                                .Id)
+                               from t in tmp.DefaultIfEmpty()
+                               where px.ShopId == shopId
+                               && p.Astatus == 0
+                               && p.IsAvailable == true
+                               && (t!=null?t.PickBatchId == lastBatchId:1==1)
+                               select new DeliveryProductDto
+                               {
+                                   ProductId = p.ProductId,
+                                   ProductName = p.ProductName,
+                                   FullAmount = px.TotalCount.Value,
+                                   RemainderAmount = px.CurrentCount.Value,
+                                   RecommendOnShelvesAmount = t != null ? t.PickAmount : 0
+                               }).DistinctByAsync(a=>a.ProductId);
+
+            return productList;
+        }
+
+        
+
+
+
+
+
+
+        public async Task<IList<ProductDto>> GetProductList(int shopId, DateTime? lastPickTime, DateTime? pickTime)
+        {
+            var query =await (from p in _shopDbContext.ProductLibrary.AsNoTracking()
+                         where p.SpId == shopId
+                         && p.Astatus==0
+                         && p.IsAvailable == true
+                         group p by p.ProductId into g
+                         let pId = g.Key
+                         select new ProductDto
+                         {
+                             ProductId = g.Key,
+                             ProductName = (_shopDbContext.ProductLibrary   
+                                                .FirstOrDefault(a=>a.ProductId==g.Key).ProductName),
+                             AllSaleAmount = (lastPickTime != null)?(_shopDbContext.OrderItemDetails
+                                                .Where(a => a.ProductId == pId)
+                                                .Where(a =>a.Dt >= lastPickTime && a.Dt <= pickTime)
+                                                .Sum(a => a.Quantity).Value):0,
+                             PickAmount = 0,
+                         }).ToListAsync();
+
+
+
+            //var query = await (from p in _shopDbContext.ProductLibrary.AsNoTracking()
+            //                   join s in _shopDbContext.OrderItemDetails.AsNoTracking()
+            //                   on p.ProductId equals s.ProductId
+            //                   where p.SpId == shopId
+            //                   && p.Astatus == 1
+            //                   && p.IsAvailable == true
+            //                   group p by p.ProductId into g
+            //                   let pId = g.Key
+            //                   select new ProductDto
+            //                   {
+            //                       ProductId = g.Key,
+            //                       ProductName = (_shopDbContext.ProductLibrary.FirstOrDefault(a => a.ProductId == g.Key).ProductName),
+            //                       AllSaleAmount = (lastPickTime != null) ? (_shopDbContext.OrderItemDetails
+            //                                          .Where(a => a.ProductId == pId)
+            //                                          .Where(a => a.Dt >= lastPickTime && a.Dt <= pickTime)
+            //                                          .Sum(a => a.Quantity).Value) : 0,
+            //                       PickAmount = 0,
+            //                   }).ToListAsync();
+            return query;
+        }
+    }
+}

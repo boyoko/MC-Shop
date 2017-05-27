@@ -1,0 +1,164 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using MC.NetCore.Repository;
+using MC.NetCore.DomainModels.RequestDto;
+using MC.NetCore.DomainModels;
+using MC.NetCore.Repository.Enums;
+using Microsoft.AspNetCore.Cors;
+using MC.NetCore.ShopApp.ResponseBaseDto;
+
+
+namespace MC.NetCore.ShopApp.Controllers
+{
+    [Route("api/[controller]/[action]")]
+    [EnableCors("AllowAnyDomain")]
+    public class DeliverController : Controller
+    {
+        private readonly IShopRepository _shopRepository;
+        private readonly IProductRepository _productRepository;
+        private readonly IOperationRepository _optRepository;
+        private readonly IShopUserRepository _shopUserRepository;
+
+
+        public DeliverController(IShopRepository shopRepository
+            , IProductRepository productRepository
+            , IOperationRepository optRepository
+            , IShopUserRepository shopUserRepository)
+        {
+            _shopRepository = shopRepository;
+            _productRepository = productRepository;
+            _optRepository = optRepository;
+            _shopUserRepository = shopUserRepository;
+        }
+        [HttpGet]
+        public IActionResult Index()
+        {
+            var list = _shopRepository.GetDeliverShopList().GetAwaiter().GetResult();
+            //return View(list);
+            return new ObjectResult(new BaseResult
+            {
+                StatusCode = Response.StatusCode,
+                Value = list
+            });
+        }
+
+
+        /// <summary>
+        /// 获取配送员列表
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> GetDeliverList()
+        {
+            var list = await _shopUserRepository.GetDeliverList();
+            return new ObjectResult(new BaseResult
+            {
+                StatusCode = Response.StatusCode,
+                Value = list
+            });
+        }
+
+
+        /// <summary>
+        /// 配送员商品列表
+        /// </summary>
+        /// <param name="shopId"></param>
+        /// <returns></returns>
+        public IActionResult DeliverProducts(int? shopId)
+        {
+            if (!shopId.HasValue)
+                throw new ArgumentNullException(nameof(shopId));
+            var list = _productRepository.GetDeliveryProductList(shopId.Value).GetAwaiter().GetResult();
+            ViewBag.ShopId = shopId;
+            //return View(list);
+            return new ObjectResult(new BaseResult
+            {
+                StatusCode = Response.StatusCode,
+                Value = list
+            });
+        }
+
+        /// <summary>
+        /// 上货页面
+        /// </summary>
+        /// <param name="shopId">店铺Id</param>
+        /// <returns></returns>
+        [HttpGet]
+        public IActionResult OnShelvesProducts(int? shopId)
+        {
+            if (!shopId.HasValue)
+                throw new ArgumentNullException(nameof(shopId));
+            var list = _productRepository.GetDeliveryProductList(shopId.Value).GetAwaiter().GetResult();
+            ViewBag.ShopId = shopId;
+            //return View(list);
+            return new ObjectResult(new BaseResult
+            {
+                StatusCode = Response.StatusCode,
+                Value = list
+            });
+        }
+
+
+        /// <summary>
+        /// 盘点页面
+        /// </summary>
+        /// <param name="shopId">店铺Id</param>
+        /// <returns></returns>
+        public IActionResult CheckStoreProducts(int? shopId)
+        {
+            if (!shopId.HasValue)
+                throw new ArgumentNullException(nameof(shopId));
+            var list = _productRepository.GetDeliveryProductList(shopId.Value).GetAwaiter().GetResult();
+            ViewBag.ShopId = shopId;
+            //return View(list);
+            return new ObjectResult(new BaseResult
+            {
+                StatusCode = Response.StatusCode,
+                Value = list
+            });
+        }
+
+
+        /// <summary>
+        /// 支持上货，下货，盘点
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> OperationProducts([FromBody]OperationProductsRequestDto model)
+        {
+            if (model.ProductList.Count <= 0)
+                throw new ArgumentNullException(nameof(model));
+            List<BoutiqueOperationLog> list = new List<BoutiqueOperationLog>();
+            foreach (var x in model.ProductList)
+            {
+                BoutiqueOperationLog entity = new BoutiqueOperationLog
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    DeliveryManId = "001",
+                    DeliveryMan = "DeliveryMan01",
+                    OperationType = model.OperationType,
+                    ProductId = x.ProductId,
+                    ChangeCount = x.ProductCount,
+                    LostCount = (model.OperationType ==(int)OperationTypeEnum.CheckStore ? (x.RemainCount - x.ProductCount) : 0),
+                    ShopId = model.ShopId,
+                    OperationDateTime = DateTime.Now
+                };
+                list.Add(entity);
+            }
+
+            var flag =await  _optRepository.CreateAsync(list);
+
+
+            return new ObjectResult(new BaseResult
+            {
+                StatusCode = Response.StatusCode,
+                Value = flag
+            });
+        }
+
+
+    }
+}

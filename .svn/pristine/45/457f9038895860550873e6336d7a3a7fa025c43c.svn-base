@@ -1,0 +1,65 @@
+﻿@using MC.NetCore.DomainModels
+@model IList<MC.NetCore.DomainModels.Dto.DeliveryShopDto>
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>小铺列表</title>
+</head>
+<body>
+    <div>
+        <div>
+            <input type="text" placeholder="搜索名字" />
+            <input type="button" value="筛选" />
+        </div>
+        <div>
+            <table id="sourcetable">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>名称</th>
+                        <th>余量</th>
+                        <th>距离</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        foreach (var s in Model)
+                        {
+                            <tr>
+                                <td>@s.DeliveryStatus<input type="hidden" value="@s.ShopId" /></td>
+                                <td>@s.ShopName</td>
+                                <td>@s.Surplus</td>
+                                <td>@s.Distance</td>
+                            </tr>
+
+                        }
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#sourcetable tbody tr").on("click", function (event) {
+                var shopId = $(this).find("td input[type='hidden']").eq(0)[0].value;
+                var shopName = $(this).find("td").eq(1).html();
+                console.log("shopId: " + shopId + "\r\n shopName: " + shopName);
+                window.location.href = "/Deliver/DeliverProducts?shopId=" + shopId;
+
+            });
+        });
+    </script>
+
+
+</body>
+</html>

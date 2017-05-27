@@ -1,0 +1,47 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using MC.NetCore.DomainModels.RequestDto;
+using Microsoft.AspNetCore.Cors;
+using MC.NetCore.Repository;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+namespace MC.NetCore.ShopApp.Controllers
+{
+    [Route("api/[controller]/[action]")]
+    [EnableCors("AllowAnyDomain")]
+    //[LoginCheckFilter(IsCheck = true)]
+    public class StoreController : Controller
+    {
+        private readonly IStoreRepository _storeRepostory;
+
+        public StoreController(IStoreRepository storeRepostory)
+        {
+            _storeRepostory = storeRepostory;
+        }
+
+        /// <summary>
+        /// ¸üÐÂ¿â´æ
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> UpdateStore([FromBody]IList<StoreRequestDto> request)
+        {
+            try
+            {
+                //var x  = value as IList<StoreRequestDto>;
+                var flag = await _storeRepostory.UpdateStore(request);
+                return new ObjectResult(new ResponseBaseDto.BaseResult { Value = flag, StatusCode = Response.StatusCode });
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(new ResponseBaseDto.BaseResult { Value = false, StatusCode = Response.StatusCode, ErrorMessage = ex.Message });
+            }
+
+        }
+    }
+}

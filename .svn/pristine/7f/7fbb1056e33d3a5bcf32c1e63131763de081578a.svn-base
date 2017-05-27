@@ -1,0 +1,217 @@
+﻿using MC.NetCore.DomainModels;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using MC.NetCore.DomainModels.Dto;
+using System.Threading.Tasks;
+using MC.NetCore.DataAccessSqlServerProvider;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Text.RegularExpressions;
+using MC.NetCore.Common.Extensions;
+
+namespace MC.NetCore.Repository
+{
+    public class ShopRepository : Repository<Shop>, IShopRepository
+    {
+        private readonly ShopDbContext _shopDbContext;
+        public ShopRepository(ShopDbContext context)
+        {
+            _shopDbContext = context;
+        }
+
+        public async Task<IList<ShopDto>> GetShopList(int? shopId, string shopName)
+        {
+            try
+            {
+                var result = new List<ShopDto>();
+                result = await (from shop in _shopDbContext.Shop.AsNoTracking()
+                                where (shop.CourseTypeIds == "2561" || shop.CourseTypeIds == "2561,")
+                                && shop.Astatus == 0 && (!shopId.HasValue || shop.ShopId == shopId)
+                                && (string.IsNullOrEmpty(shopName) || shop.ShopName.Contains(shopName))
+                                select new ShopDto
+                                {
+                                    ShopId = shop.ShopId,
+                                    ShopName = shop.ShopName,
+                                }).ToListAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public async Task<IList<ShopDto>> GetShopList()
+        {
+            var result = new List<ShopDto>();
+            try
+            {
+                var query = await (from shop in _shopDbContext.Shop.AsNoTracking()
+                                   join bat in _shopDbContext.GoodsPickingBatch
+                                   on shop.ShopId equals bat.ShopId into tmp
+                                   from t in tmp.DefaultIfEmpty()
+                                   where (shop.CourseTypeIds == "2561" || shop.CourseTypeIds == "2561,")
+                                   && shop.Astatus == 0
+                                   && shop.IsEnable == true
+                                   //&& (t!=null? (!(t.PickupType.HasValue && t.PickupType.Value == 2)):1==1)
+                                   select new ShopDto
+                                   {
+                                       ShopId = shop.ShopId,
+                                       ShopName = shop.ShopName,
+                                       TotalAmount = 0,
+                                       PickTime = t != null ? t.PickTime : DateTime.Now,
+                                       PickStatus = t!=null?t.DeliveryStatus:0
+                                   }).OrderByDescending(a => a.PickTime)
+                                   .DistinctByAsync(a => a.ShopId);
+
+
+                query.ForEach(a => a.TotalAmount = GetTotalSale(a));
+
+                return query;
+            }
+            catch(Exception e)
+            {
+                throw e;
+            }
+        }
+
+        private decimal GetTotalSale(ShopDto dto)
+        {
+            var query = (from m in _shopDbContext.OrderForm
+                         join sub in _shopDbContext.OrderItemDetails
+                         on m.OrderCode equals sub.OrderCode   
+                         where m.Status==4
+                         && m.ShopId==dto.ShopId
+                         && m.OrderTime>=dto.PickTime
+                         && m.OrderTime <= DateTime.Now
+                         select sub.Quantity * sub.PurchasePrice).Sum();
+            var picked = (from m in _shopDbContext.GoodsPickingBatch
+                         join sub in _shopDbContext.GoodsPickingDetail
+                         on m.Id equals sub.PickBatchId
+                          join product in _shopDbContext.ProductLibrary
+                          on sub.ProductId equals product.ProductId
+                          where m.PickTime > dto.PickTime
+                         && m.ShopId == dto.ShopId
+                         && m.PickupType == 2   
+                         select sub.PickAmount * product.DiscountPrice).Sum();
+            decimal retval = 0;
+            if (query.HasValue)
+                retval = query.Value;
+            if (picked.HasValue)
+                retval -= picked.Value;
+            if (retval < 0)
+                retval = 0;
+            return retval;
+        }
+
+        public async Task<IList<DeliveryShopDto>> GetDeliverShopList()
+        {
+            var result = new List<DeliveryShopDto>();
+            try
+            {
+                result =await (from s in _shopDbContext.Shop.AsNoTracking()
+                               join bat in _shopDbContext.GoodsPickingBatch.AsNoTracking()
+                             on s.ShopId equals bat.ShopId into tmp
+                             from t in tmp.DefaultIfEmpty()
+                               let deliver = (_shopDbContext.UserBelongToShop.FirstOrDefault(a => a.ShopId == s.ShopId))
+                               where (s.CourseTypeIds == "2561" || s.CourseTypeIds == "2561,")
+                               && s.Astatus == 0
+                             && s.IsEnable == true
+                               select new DeliveryShopDto
+                                {
+                                    ShopId = s.ShopId,
+                                    ShopName = s.ShopName,
+                                    Distance = "定位失败！",
+                                    DeliveryStatus = t != null ? t.DeliveryStatus : 0,
+                                    DeliveryTime = t != null ? t.PickTime : DateTime.Now,
+                                    DeliveryManId = deliver!=null?deliver.UserId:null,
+                                    DeliveryMan = deliver!=null?(_shopDbContext.ShopUserInfo.FirstOrDefault(a=>a.UserId==deliver.UserId && a.RoleId==3).UserName):null
+                                }).DistinctByAsync(a=>a.ShopId);
+
+
+                result.ForEach(a => a.Surplus = SetSurplus(a));
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="productId">商铺Id</param>
+        /// <param name="batchId">捡货批次</param>
+        /// <returns></returns>
+        private decimal GetTotal(int shopId, string batchId)
+        {
+            decimal total = 0;
+            //商铺某一批次捡货的产品和数量
+            var productListInShop = (from main in _shopDbContext.GoodsPickingBatch.AsNoTracking()
+                                     join sub in _shopDbContext.GoodsPickingDetail.AsNoTracking()
+                                     on main.Id equals sub.PickBatchId
+                                     where sub.PickBatchId == batchId
+                                     select new
+                                     {
+                                         sub.ProductId,
+                                         sub.PickAmount
+                                     }).ToList();
+
+
+            foreach (var x in productListInShop)
+            {
+                var price = _shopDbContext.ProductLibrary.AsNoTracking()
+                            .FirstOrDefault(a => a.SpId == shopId && a.ProductId == x.ProductId)?.Price;
+
+                total += Convert.ToDecimal(x.PickAmount * price);
+            }
+
+
+            return total;
+        }
+
+        private decimal? SetSurplus(DeliveryShopDto obj)
+        {
+            try
+            {
+                var tmp = 
+                    (from p in _shopDbContext.ProductLibrary.AsNoTracking()
+                                join px in _shopDbContext.ProductExtense.AsNoTracking()
+                                on p.ProductId equals px.ProductId
+                                where px.ShopId == obj.ShopId
+                                && p.Astatus==0
+                                && p.IsAvailable ==true
+                                select new { px.CurrentCount, p.Price,px.TotalCount}).ToList();
+                decimal fullSum = 0;
+                decimal storeSum = 0;
+                if (tmp!=null && tmp.Any())
+                {
+                    foreach(var x in tmp)
+                    {
+                        fullSum += Convert.ToDecimal(x.TotalCount * x.Price);
+                        storeSum += Convert.ToDecimal(x.CurrentCount * x.Price);
+                    }
+                    if (fullSum != 0)
+                    {
+                        //结果在前端加% 即可
+                        var c = storeSum * 100 / fullSum;
+                        return obj.Surplus = Math.Round(c,2);
+                    }
+                    else
+                    {
+                        return obj.Surplus = 0;
+                    }
+                }
+
+                return obj.Surplus = 0;
+            }catch (Exception e)
+            {
+                throw e;
+            }
+            
+        }
+
+    }
+}

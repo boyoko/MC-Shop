@@ -1,0 +1,262 @@
+﻿using MC.NetCore.DomainModels;
+using MC.NetCore.DomainModels.Dto;
+using MC.NetCore.DomainModels.RequestDto;
+using MC.NetCore.Repository;
+using MC.NetCore.ShopApp.Extension;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace MC.NetCore.ShopApp.Services
+{
+    public interface IBoutiqueService
+    {
+        List<ShopStatisticInfo> GetBoutiqueStatisticsInfo(ShopStatisticQueryDto queryInfo);
+    }
+
+    public class BoutiqueService : IBoutiqueService
+    {
+
+        private readonly IShopRepository _shopRepository;
+        private readonly IProductRepository _productRepository;
+        private readonly IOperationRepository _operationRepository;
+
+        public BoutiqueService(IShopRepository shopRepository, IProductRepository productRepository, IOperationRepository operationRepository)
+        {
+            _operationRepository = operationRepository;
+            _productRepository = productRepository;
+            _shopRepository = shopRepository;
+        }
+
+        #region 测试数据
+        public List<BoutiqueOperationLog> GetLog()
+        {
+            var retval = new List<BoutiqueOperationLog>();
+            retval.Add(new BoutiqueOperationLog() { Id = "1", ProductId = 1895, ShopId = 10741, ChangeCount = 2, OperationType = 1, OperationDateTime = new DateTime(2017, 4, 1, 1, 2, 3) });
+            retval.Add(new BoutiqueOperationLog() { Id = "2", ProductId = 1895, ShopId = 10741, ChangeCount = 2, OperationType = 1, OperationDateTime = new DateTime(2017, 4, 2, 3, 3, 3) });
+            retval.Add(new BoutiqueOperationLog() { Id = "3", ProductId = 1895, ShopId = 10741, ChangeCount = 9, OperationType = 3, OperationDateTime = new DateTime(2017, 4, 2, 3, 3, 4) });
+            retval.Add(new BoutiqueOperationLog() { Id = "4", ProductId = 1895, ShopId = 10741, ChangeCount = 4, OperationType = 1, OperationDateTime = new DateTime(2017, 4, 2, 3, 3, 5) });
+            retval.Add(new BoutiqueOperationLog() { Id = "5", ProductId = 1895, ShopId = 10741, ChangeCount = 2, OperationType = 2, OperationDateTime = new DateTime(2017, 4, 2, 3, 3, 6) });
+            retval.Add(new BoutiqueOperationLog() { Id = "8", ProductId = 1895, ShopId = 10741, ChangeCount = 3, OperationType = 3, LostCount = 1, OperationDateTime = new DateTime(2017, 4, 6, 3, 1, 1) });
+            retval.Add(new BoutiqueOperationLog() { Id = "6", ProductId = 1895, ShopId = 10741, ChangeCount = 6, OperationType = 1, OperationDateTime = new DateTime(2017, 4, 7, 4, 1, 1) });
+            retval.Add(new BoutiqueOperationLog() { Id = "7", ProductId = 1895, ShopId = 10741, ChangeCount = 1, OperationType = 2, OperationDateTime = new DateTime(2017, 4, 7, 4, 1, 1) });
+            retval.Add(new BoutiqueOperationLog() { Id = "8", ProductId = 1895, ShopId = 10741, ChangeCount = 0, OperationType = 3, LostCount = 1, OperationDateTime = new DateTime(2017, 4, 7, 4, 1, 1) });
+            return retval;
+        }
+        #endregion
+        public List<ShopStatisticInfo> GetBoutiqueStatisticsInfo(ShopStatisticQueryDto queryInfo)
+        {
+            var filterBoutiques = _shopRepository.GetShopList(queryInfo.ShopID,queryInfo.ShopNameKey).Result.ToDictionary(m=>m.ShopId);
+            var shopids = new HashSet<int>();
+            filterBoutiques.Keys.All(m => shopids.Add(m));
+            var products = _productRepository.GetProductListByShopId(shopids).Result.ToDictionary(m => m.ProductId);
+          
+            //var logs = GetLog();
+            var logs = _operationRepository.GetBoutiqueOperationLog(queryInfo.BeginDateTime,queryInfo.EnDateTime).Result;
+
+            var groups = from i in logs
+                         where filterBoutiques.ContainsKey(i.ShopId)
+                         group i by i.ShopId
+    into g
+                         select new
+                         {
+                             ShopId = g.Key,
+                             ShopDataByDate = from shopData in g
+                                              orderby shopData.OperationDateTime
+                                              group shopData by shopData.OperationDateTime.ToString("yyyy-MM-dd")
+                             into s
+                                              select new
+                                              {
+                                                  Date = s.Key,
+                                                  DateDataByProductID = from dateData in s
+                                                                        orderby dateData.OperationDateTime
+                                                                        group dateData by dateData.ProductId
+                                                  into p
+                                                                        select new
+                                                                        {
+                                                                            ProductId = p.Key,
+                                                                            Productdata = p.AsEnumerable()
+                                                                        }
+                                              }
+                         };
+
+            List<ShopStatisticInfo> result = new List<ShopStatisticInfo>();
+            foreach (var boutique in filterBoutiques.Values)
+            {
+                result.Add(new ShopStatisticInfo(boutique.ShopId, boutique.ShopName));
+            }
+            Func<int, decimal> GetProductPrice = delegate (int productId)
+            {
+                if (!products.ContainsKey(productId))
+                {
+                    var curentProduct = _productRepository.GetProductListByProductId(productId).Result;
+                    products.Add(curentProduct.ProductId, curentProduct);
+                }
+                return products[productId].Price.HasValue ? products[productId].Price.Value : 0;
+            };
+            Func<int?, int, decimal> GetProductsTotalAmount = delegate (int? count, int productId)
+            {
+                return (count.HasValue ? count.Value : 0) * GetProductPrice(productId);
+            };
+            foreach (var item in groups)
+            {
+                ShopStatisticInfo currentInfo = result.First(m => m.ShopID == item.ShopId);
+                bool isFindCheckPont = false;
+                ShopStatisticInfoDetail currentStatisticDetail = null;
+                ShopStatisticInfoDetail prevousStatisticDetail = null;
+                foreach (var shopData in item.ShopDataByDate)
+                {
+                    bool hasCheckPontToday = shopData.DateDataByProductID.SelectMany(m => m.Productdata)
+                        .Any(m => m.OperationType.ToEnumOperationType() == EnumOperationType.Checkout);
+                    if (hasCheckPontToday)
+                    {
+                        prevousStatisticDetail = currentStatisticDetail;
+                        currentStatisticDetail = currentInfo.CreatDetail(DateTime.Parse(shopData.Date));
+                    }
+                    if (!isFindCheckPont && !hasCheckPontToday)
+                    {
+                        continue;
+                    }
+                    else if (!isFindCheckPont && hasCheckPontToday)
+                    {
+                        foreach (var product in shopData.DateDataByProductID)
+                        {
+                            bool isFindProductCheckPont = false;
+                            bool hasProductCheckPointToday =
+                                product.Productdata.Any(m => m.OperationType.ToEnumOperationType() == EnumOperationType.Checkout);
+                            if (hasProductCheckPointToday)
+                            {
+                                var firstCheckoutPoint = product.Productdata.First(m => m.OperationType.ToEnumOperationType() == EnumOperationType.Checkout);
+                                var otherCheckoutPoints = product.Productdata.Where(m => m.OperationType.ToEnumOperationType() == EnumOperationType.Checkout).Skip(1);
+                                currentStatisticDetail.SellMoney += GetProductsTotalAmount(firstCheckoutPoint.ChangeCount, firstCheckoutPoint.ProductId);
+                                otherCheckoutPoints.All(m => {
+                                    currentStatisticDetail.LostMoney += GetProductsTotalAmount(m.LostCount, m.ProductId);
+                                    return true;
+                                });
+                            }
+
+                            foreach (var productData in product.Productdata)
+                            {
+                                isFindProductCheckPont = isFindProductCheckPont || productData.OperationType.ToEnumOperationType() == EnumOperationType.Checkout;
+                                isFindCheckPont = isFindCheckPont || productData.OperationType.ToEnumOperationType() == EnumOperationType.Checkout;
+
+                                if (hasProductCheckPointToday && isFindProductCheckPont)
+                                {
+                                    //if (productData.OperationType.ToEnumOperationType() == EnumOperationType.Checkout)
+                                    //{
+                                    //    currentStatisticDetail.SellMoney += GetProductsTotalAmount(productData.ChangeCount, productData.ProductId); 
+                                    //}
+                                    //else 
+                                    if (productData.OperationType.ToEnumOperationType() == EnumOperationType.OnShelf)
+                                    {
+                                        currentStatisticDetail.SellMoney += GetProductsTotalAmount(productData.ChangeCount, productData.ProductId);
+                                    }
+                                    else if (productData.OperationType.ToEnumOperationType() == EnumOperationType.OffShelf)
+                                    {
+                                        currentStatisticDetail.SellMoney -= GetProductsTotalAmount(productData.ChangeCount, productData.ProductId);
+                                    }
+                                }
+                                else if (!hasProductCheckPointToday)
+                                {
+                                    if (productData.OperationType.ToEnumOperationType() == EnumOperationType.OnShelf)
+                                    {
+                                        currentStatisticDetail.SellMoney += GetProductsTotalAmount(productData.ChangeCount, productData.ProductId);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else if (isFindCheckPont && hasCheckPontToday)
+                    {
+                        foreach (var product in shopData.DateDataByProductID)
+                        {
+                            bool isFindProductCheckPont = false;
+                            bool hasProductCheckPointToday =
+                                product.Productdata.Any(m => m.OperationType.ToEnumOperationType() == EnumOperationType.Checkout);                            
+                            foreach (BoutiqueOperationLog productData in product.Productdata)
+                            {
+                                isFindProductCheckPont = isFindProductCheckPont || productData.OperationType.ToEnumOperationType() ==
+                                                         EnumOperationType.Checkout;
+
+                                if (hasProductCheckPointToday && !isFindProductCheckPont)
+                                {
+                                    if (productData.OperationType.ToEnumOperationType() == EnumOperationType.OnShelf)
+                                    {
+                                        prevousStatisticDetail.SellMoney += GetProductsTotalAmount(productData.ChangeCount, productData.ProductId);
+                                    }
+                                    else
+                                    {
+                                        prevousStatisticDetail.SellMoney -= GetProductsTotalAmount(productData.ChangeCount, productData.ProductId);
+                                    }
+                                }
+                                else if (hasProductCheckPointToday && isFindProductCheckPont)
+                                {
+                                    //if (productData.OperationType.ToEnumOperationType() == EnumOperationType.Checkout)
+                                    //{
+                                    //    prevousStatisticDetail.SellMoney -= GetProductsTotalAmount(productData.ChangeCount, productData.ProductId);
+                                    //    prevousStatisticDetail.LostMoney += GetProductsTotalAmount(productData.LostCount, productData.ProductId);
+                                    //    prevousStatisticDetail.EndDate = DateTime.Parse(shopData.Date);
+                                    //    currentStatisticDetail.SellMoney += GetProductsTotalAmount(productData.ChangeCount, productData.ProductId);
+                                    //}
+                                    //else 
+                                    if (productData.OperationType.ToEnumOperationType() == EnumOperationType.OnShelf)
+                                    {
+                                        currentStatisticDetail.SellMoney += GetProductsTotalAmount(productData.ChangeCount, productData.ProductId);
+                                    }
+                                    else if (productData.OperationType.ToEnumOperationType() == EnumOperationType.OffShelf)
+                                    {
+                                        currentStatisticDetail.SellMoney -= GetProductsTotalAmount(productData.ChangeCount, productData.ProductId);
+                                    }
+                                }
+                                else if (!hasProductCheckPointToday)
+                                {
+                                    if (productData.OperationType.ToEnumOperationType() == EnumOperationType.OnShelf)
+                                    {
+                                        currentStatisticDetail.SellMoney += GetProductsTotalAmount(productData.ChangeCount, productData.ProductId);
+                                    }
+                                    else if (productData.OperationType.ToEnumOperationType() == EnumOperationType.OffShelf)
+                                    {
+                                        prevousStatisticDetail.SellMoney -= GetProductsTotalAmount(productData.ChangeCount, productData.ProductId);
+                                    }
+                                }
+                                if (hasProductCheckPointToday)
+                                {
+                                    var lastCheckoutPoint = product.Productdata.Last(m => m.OperationType.ToEnumOperationType() == EnumOperationType.Checkout);
+                                    var otherCheckoutPoints = product.Productdata.Where(m => m.OperationType.ToEnumOperationType() == EnumOperationType.Checkout);
+
+                                    otherCheckoutPoints.All(m => {
+                                        prevousStatisticDetail.LostMoney += GetProductsTotalAmount(m.LostCount, m.ProductId);
+                                        return true;
+                                    });
+                                    prevousStatisticDetail.SellMoney -= GetProductsTotalAmount(lastCheckoutPoint.ChangeCount, lastCheckoutPoint.ProductId);
+                                    prevousStatisticDetail.EndDate = DateTime.Parse(shopData.Date);
+                                    currentStatisticDetail.SellMoney += GetProductsTotalAmount(lastCheckoutPoint.ChangeCount, lastCheckoutPoint.ProductId);
+                                }
+                            }
+                        }
+                    }
+                    else if (isFindCheckPont && !hasCheckPontToday)
+                    {
+                        foreach (var product in shopData.DateDataByProductID)
+                        {
+                            foreach (var productData in product.Productdata)
+                            {
+                                if (productData.OperationType.ToEnumOperationType() == EnumOperationType.OnShelf)
+                                {
+                                    currentStatisticDetail.SellMoney += GetProductsTotalAmount(productData.ChangeCount, productData.ProductId);
+                                }
+                                else
+                                {
+                                    currentStatisticDetail.SellMoney -= GetProductsTotalAmount(productData.ChangeCount, productData.ProductId);
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+            return result;
+        }
+    }
+}

@@ -1,0 +1,81 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.Threading.Tasks;
+using MC.NetCore.DomainModels.Dto;
+using MC.NetCore.DataAccessSqlServerProvider;
+using System.Linq;
+using Microsoft.EntityFrameworkCore;
+using MC.NetCore.DomainModels.RequestDto;
+using MC.NetCore.Common.Extensions;
+
+namespace MC.NetCore.Repository
+{
+    public class ShopUserRepository : IShopUserRepository
+    {
+        private readonly ShopDbContext _shopDbContext;
+        public ShopUserRepository(ShopDbContext shopDbContext)
+        {
+            _shopDbContext = shopDbContext;
+        }
+
+        /// <summary>
+        /// 返回配送员列表
+        /// </summary>
+        /// <returns></returns>
+        //public async Task<IList<UserDto>> GetDeliverList()
+        //{
+        //    var query = await (from a in _shopDbContext.ShopUserInfo.AsNoTracking()
+        //                       join b in _shopDbContext.UserBelongToShop.AsNoTracking()
+        //                       on a.UserId equals b.UserId into temp
+        //                       where a.RoleId == 3
+        //                       from s in temp.DefaultIfEmpty()
+        //                       select new UserDto
+        //                       {
+        //                           UserId = a.UserId,
+        //                           UserName = a.UserName,
+        //                           RoleId = a.RoleId,
+        //                           RoleName = a.RoleName,
+        //                           ShopId = s != null ? s.ShopId : null
+        //                       }).DistinctByAsync(a => a.UserId);
+        //    return query;
+        //}
+
+        public async Task<IList<DeliverDto>> GetDeliverList()
+        {
+            var query = await (from a in _shopDbContext.ShopUserInfo.AsNoTracking()
+                               where a.RoleId == 3
+                               select new DeliverDto
+                               {
+                                   UserId = a.UserId,
+                                   UserName = a.UserName,
+                                   ShopId = (from c in _shopDbContext.UserBelongToShop
+                                             where c.UserId == a.UserId
+                                             select c.ShopId.Value).ToList()
+                               }).DistinctByAsync(a => a.UserId);
+            return query;
+        }
+
+
+        public async Task<UserDto> LoginOn(LoginOnRequestDto request)
+        {
+            var query = await (from a in _shopDbContext.ShopUserInfo.AsNoTracking()
+                         join b in _shopDbContext.UserBelongToShop.AsNoTracking()
+                         on a.UserId equals b.UserId into tmp
+                         where a.UserName==request.UserName
+                         && a.Password == request.Password
+                         //&& a.RoleId == request.Role
+                         from s in tmp.DefaultIfEmpty()
+                         select new UserDto
+                         {
+                             UserId = a.UserId,
+                             UserName = a.UserName,
+                             RoleId = a.RoleId,
+                             RoleName = a.RoleName,
+                             ShopId = s!=null?s.ShopId:null
+                         }).FirstOrDefaultAsync();
+
+            return query;
+        }
+    }
+}

@@ -1,0 +1,87 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using MC.NetCore.DomainModels.Dto;
+using MC.NetCore.DomainModels.RequestDto;
+using Microsoft.AspNetCore.Cors;
+using MC.NetCore.ShopApp.Services;
+using MC.NetCore.Repository;
+using MC.NetCore.ShopApp.Filters;
+
+namespace MC.NetCore.ShopApp.Controllers
+{
+    [Route("api/[controller]/[action]")]
+    [EnableCors("AllowAnyDomain")]
+    [LoginCheckFilter(IsCheck = true)]
+    public class BoutiqueController : Controller
+    {
+        private readonly IShopRepository _shopRepository;
+        private readonly IProductRepository _productRepository;
+        private readonly IOperationRepository _optRepository;
+
+
+        public BoutiqueController(IShopRepository shopRepository
+            , IProductRepository productRepository
+            , IOperationRepository optRepository)
+        {
+            _shopRepository = shopRepository;
+            _productRepository = productRepository;
+            _optRepository = optRepository;
+        }
+        public IEnumerable<ShopStatisticInfo> GetBoutiqueStatisticsInfo(ShopStatisticQueryDto queryDto)
+        {
+            var boutiqueService = new BoutiqueService(_shopRepository,_productRepository,_optRepository);
+            string cacheKey = string.Format("{0}-{1} {2}-{3}", queryDto.ShopID, queryDto.ShopNameKey, queryDto.BeginDateTime, queryDto.EnDateTime);
+            List<ShopStatisticInfo> result = boutiqueService.GetBoutiqueStatisticsInfo(queryDto);
+            IEnumerable<ShopStatisticInfo> retval = new List<ShopStatisticInfo>();
+            if (queryDto.OrderOrention)
+            {
+                retval = result.OrderBy(m =>
+                {
+                    if (!string.IsNullOrEmpty(queryDto.OrderKey) && queryDto.OrderKey.Equals("saleamount",StringComparison.CurrentCultureIgnoreCase))
+                        return m.SellMoney;
+                    else
+                        return m.CreditScore;
+                });
+            }
+            else
+            {
+                retval = result.OrderByDescending(m =>
+                {
+                    if (!string.IsNullOrEmpty(queryDto.OrderKey) && queryDto.OrderKey.Equals("saleamount",StringComparison.CurrentCultureIgnoreCase))
+                        return m.SellMoney;
+                    else
+                        return m.CreditScore;
+                });
+            }
+            retval = retval.Skip((queryDto.PageIndex - 1) * queryDto.PageSize).Take(queryDto.PageSize);
+            return retval;
+        }
+        
+        public ActionResult GetBoutiqueStatistics(ShopStatisticViewQueryDto queryDto)
+        {
+            try
+            { 
+                var result = GetBoutiqueStatisticsInfo(queryDto.ToShopStatisticQueryDto());
+                return new ObjectResult(new
+                {
+                    status = 1,
+                    massage = "",
+                    data = result,
+                    hasmore = result.Count() > 0
+                });
+            }
+            catch (Exception ex)
+            {
+                return new ObjectResult(new
+                {
+                    status = -1,
+                    massage = ex.Message
+                });
+            }
+
+        }
+    }
+}
