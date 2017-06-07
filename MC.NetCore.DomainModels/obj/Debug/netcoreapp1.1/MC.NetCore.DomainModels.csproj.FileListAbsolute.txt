@@ -1,0 +1,14 @@
+E:\SourceCode\MC.NetCore.Shop\MC.NetCore.DomainModels\bin\Debug\netcoreapp1.1\MC.NetCore.DomainModels.deps.json
+E:\SourceCode\MC.NetCore.Shop\MC.NetCore.DomainModels\bin\Debug\netcoreapp1.1\MC.NetCore.DomainModels.dll
+E:\SourceCode\MC.NetCore.Shop\MC.NetCore.DomainModels\bin\Debug\netcoreapp1.1\MC.NetCore.DomainModels.pdb
+E:\SourceCode\MC.NetCore.Shop\MC.NetCore.DomainModels\obj\Debug\netcoreapp1.1\MC.NetCore.DomainModels.AssemblyInfo.cs
+E:\SourceCode\MC.NetCore.Shop\MC.NetCore.DomainModels\obj\Debug\netcoreapp1.1\MC.NetCore.DomainModels.dll
+E:\SourceCode\MC.NetCore.Shop\MC.NetCore.DomainModels\obj\Debug\netcoreapp1.1\MC.NetCore.DomainModels.pdb
+E:\SourceCode\MC.NetCore.Shop\MC.NetCore.DomainModels\obj\Debug\netcoreapp1.1\MC.NetCore.DomainModels.csprojResolveAssemblyReference.cache
+E:\SourceCode\shop\MC.NetCore.DomainModels\bin\Debug\netcoreapp1.1\MC.NetCore.DomainModels.deps.json
+E:\SourceCode\shop\MC.NetCore.DomainModels\bin\Debug\netcoreapp1.1\MC.NetCore.DomainModels.dll
+E:\SourceCode\shop\MC.NetCore.DomainModels\bin\Debug\netcoreapp1.1\MC.NetCore.DomainModels.pdb
+E:\SourceCode\shop\MC.NetCore.DomainModels\obj\Debug\netcoreapp1.1\MC.NetCore.DomainModels.AssemblyInfo.cs
+E:\SourceCode\shop\MC.NetCore.DomainModels\obj\Debug\netcoreapp1.1\MC.NetCore.DomainModels.dll
+E:\SourceCode\shop\MC.NetCore.DomainModels\obj\Debug\netcoreapp1.1\MC.NetCore.DomainModels.pdb
+E:\SourceCode\shop\MC.NetCore.DomainModels\obj\Debug\netcoreapp1.1\MC.NetCore.DomainModels.csprojResolveAssemblyReference.cache

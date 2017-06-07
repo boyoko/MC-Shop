@@ -3,3 +3,8 @@
 ################################################################################
 
 /MC.NetCore.Common/obj
+/MC.NetCore.DataAccessSqlServerProvider/bin/Debug/netcoreapp1.1
+/MC.NetCore.ShopApi/bin/Debug/netcoreapp1.1
+/MC.NetCore.ShopApi/obj
+/MC.NetCore.ShopApp/bin/Debug/netcoreapp1.1
+/MC.NetCore.ShopApp/obj
