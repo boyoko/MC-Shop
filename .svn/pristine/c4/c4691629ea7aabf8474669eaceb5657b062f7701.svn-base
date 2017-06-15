@@ -33,12 +33,12 @@ namespace MC.NetCore.InitDataConsole
 
             using (var db = new ShopDbContext(optionsBuilder.Options))
             {
-                //ShopRepository shop = new ShopRepository(db);
-                //var sw = new Stopwatch();
-                //sw.Start();
-                //shop.GetShopList().GetAwaiter().GetResult();
-                //sw.Stop();
-                //Console.WriteLine("Use {0} Milliseconds", sw.ElapsedMilliseconds);
+                ShopRepository shop = new ShopRepository(db);
+                var sw = new Stopwatch();
+                sw.Start();
+                shop.GetShopList().GetAwaiter().GetResult();
+                sw.Stop();
+                Console.WriteLine("Use {0} Milliseconds", sw.ElapsedMilliseconds);
                 //var shopList = (from s in db.Shop.AsNoTracking()
                 //                where (s.CourseTypeIds == "2561" || s.CourseTypeIds == "2561,")
                 //                && s.IsEnable == true
